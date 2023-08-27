@@ -11,10 +11,12 @@
     <button onclick="mintTokens()">Mint Tokens</button>
 
     <script>
-        const contractAddress = '0x9725ebA772539b5C05D9DaA19B1a15cb51ce2621'; // Replace with your contract's address
+        async function mintTokens() {
+            if (typeof window.ethereum !== 'undefined') {
+                const contractAddress = '0x9725ebA772539b5C05D9DaA19B1a15cb51ce2621'; // Replace with your contract's address
 
-        const contractABI = [
-            [
+                const contractABI = [
+                    [
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -291,27 +293,30 @@
 		"type": "function"
 	}
 ]
-            {
-                "inputs": [],
-                "stateMutability": "nonpayable",
-                "type": "constructor"
-            },
-            // ... Other ABI entries ...
-        ];
+                    {
+                        "inputs": [],
+                        "stateMutability": "nonpayable",
+                        "type": "constructor"
+                    },
+                    // ... Other ABI entries ...
+                ];
 
-        const web3 = new Web3(window.ethereum);
-        const contract = new web3.eth.Contract(contractABI, contractAddress);
+                const web3 = new Web3(window.ethereum);
+                await window.ethereum.enable(); // Request account access from MetaMask
+                const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-        async function mintTokens() {
-            const accounts = await web3.eth.getAccounts();
-            const sender = accounts[0];
+                const accounts = await web3.eth.getAccounts();
+                const sender = accounts[0];
 
-            try {
-                await contract.methods.mintTokens(sender, web3.utils.toWei('100', 'ether')).send({ from: sender });
-                alert('Tokens minted successfully!');
-            } catch (error) {
-                console.error(error);
-                alert('An error occurred while minting tokens.');
+                try {
+                    await contract.methods.mintTokens(sender, web3.utils.toWei('100', 'ether')).send({ from: sender });
+                    alert('Tokens minted successfully!');
+                } catch (error) {
+                    console.error(error);
+                    alert('An error occurred while minting tokens.');
+                }
+            } else {
+                alert('Please install MetaMask to use this feature.');
             }
         }
     </script>
