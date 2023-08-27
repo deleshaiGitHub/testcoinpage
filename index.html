@@ -11,7 +11,7 @@
     <button id="connectWalletButton">Connect Wallet</button>
   </header>
   <main>
-    <h1>Lucky One Token Minting</h1>
+    <h1>Lucky Token Minting</h1>
     <p>Click the button below to mint your Lucky tokens!</p>
     <button id="mintButton" disabled>Mint Lucky Tokens</button>
   </main>
@@ -22,36 +22,40 @@
       const mintButton = document.getElementById('mintButton');
       let web3;
 
-      if (typeof window.ethereum !== 'undefined') {
+      async function connectWallet() {
         try {
-          await window.ethereum.request({ method: 'eth_requestAccounts' });
-          web3 = new Web3(window.ethereum);
+          await ethereum.request({ method: 'eth_requestAccounts' });
+          web3 = new Web3(ethereum);
           mintButton.disabled = false;
         } catch (error) {
           console.error('Error connecting wallet:', error);
         }
+      }
 
-        mintButton.addEventListener('click', async () => {
-          try {
-            const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your actual contract address
-            const contractABI = []; // Replace with your contract's ABI
-            const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-            const accounts = await web3.eth.getAccounts();
-            const account = accounts[0];
-
-            const result = await contract.methods.mintTokens().send({ from: account });
-
-            console.log('Minting result:', result);
-            // Handle success or update UI accordingly
-          } catch (error) {
-            console.error('Error minting tokens:', error);
-            // Handle error or update UI accordingly
-          }
-        });
+      if (typeof ethereum !== 'undefined') {
+        connectWalletButton.addEventListener('click', connectWallet);
       } else {
         connectWalletButton.textContent = 'No Wallet Detected';
       }
+
+      mintButton.addEventListener('click', async () => {
+        try {
+          const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your actual contract address
+          const contractABI = []; // Replace with your contract's ABI
+          const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+          const accounts = await web3.eth.getAccounts();
+          const account = accounts[0];
+
+          const result = await contract.methods.mintTokens().send({ from: account });
+
+          console.log('Minting result:', result);
+          // Handle success or update UI accordingly
+        } catch (error) {
+          console.error('Error minting tokens:', error);
+          // Handle error or update UI accordingly
+        }
+      });
     });
   </script>
 </body>
