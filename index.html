@@ -3,27 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Token Minting</title>
+    <title>Mint Tokens</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
 </head>
 <body>
-    <h1>Lucky Token Minting</h1>
-    <p>Connect your MetaMask wallet to mint Lucky tokens.</p>
-    
-    <button id="connectButton">Connect MetaMask</button>
-    
-    <div id="mintForm" style="display: none;">
-        <input type="number" id="mintAmount" placeholder="Amount to Mint">
-        <button id="mintButton">Mint Tokens</button>
-    </div>
-    
-    <div id="balance">
-        Your Token Balance: <span id="tokenBalance">0</span>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
+    <h1>Mint Tokens</h1>
+    <button onclick="mintTokens()">Mint Tokens</button>
+
     <script>
-        const contractAddress = '0x9725ebA772539b5C05D9DaA19B1a15cb51ce2621'; // Replace with your contract address
-        const contractABI = [[
+        const contractAddress = '0x9725ebA772539b5C05D9DaA19B1a15cb51ce2621'; // Replace with your contract's address
+
+        const contractABI = [
+            [
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -299,60 +290,30 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-]]; // Replace with your contract's ABI
-        
+]
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            // ... Other ABI entries ...
+        ];
+
         const web3 = new Web3(window.ethereum);
-        
-        const connectButton = document.getElementById('connectButton');
-        const mintForm = document.getElementById('mintForm');
-        const mintAmount = document.getElementById('mintAmount');
-        const mintButton = document.getElementById('mintButton');
-        const tokenBalance = document.getElementById('tokenBalance');
-        
-        connectButton.addEventListener('click', async () => {
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+        async function mintTokens() {
+            const accounts = await web3.eth.getAccounts();
+            const sender = accounts[0];
+
             try {
-                await window.ethereum.enable();
-                const accounts = await web3.eth.getAccounts();
-                const sender = accounts[0];
-                
-                mintForm.style.display = 'block';
-                
-                const contract = new web3.eth.Contract(contractABI, contractAddress);
-                const balance = await contract.methods.balanceOf(sender).call();
-                tokenBalance.textContent = web3.utils.fromWei(balance, 'ether');
-            } catch (error) {
-                console.error(error);
-                alert('An error occurred while connecting to MetaMask.');
-            }
-        });
-        
-        mintButton.addEventListener('click', async () => {
-            try {
-                const accounts = await web3.eth.getAccounts();
-                const sender = accounts[0];
-                const amountToMint = web3.utils.toWei(mintAmount.value, 'ether');
-                
-                const contract = new web3.eth.Contract(contractABI, contractAddress);
-                const result = await contract.methods.mintTokens(sender, amountToMint).send({ from: sender });
-                
-                console.log(result);
+                await contract.methods.mintTokens(sender, web3.utils.toWei('100', 'ether')).send({ from: sender });
                 alert('Tokens minted successfully!');
-                
-                const balance = await contract.methods.balanceOf(sender).call();
-                tokenBalance.textContent = web3.utils.fromWei(balance, 'ether');
             } catch (error) {
                 console.error(error);
                 alert('An error occurred while minting tokens.');
             }
-        });
+        }
     </script>
-</body>
-</html>
-
-
-
-        <h2>Contact Me</h2>
-        <p>You can reach me at: your.email@example.com</p>
-    </div>
 </body>
 </html>
