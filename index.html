@@ -3,57 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lucky Token Minting</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Captcha Page</title>
+  <style>
+    /* Basic styling for the page */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    main {
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <button id="connectWalletButton">Connect Wallet</button>
-  </header>
   <main>
-    <h1>Lucky Token Minting</h1>
-    <p>Click the button below to mint your Lucky tokens!</p>
-    <button id="mintButton" disabled>Mint Lucky Tokens</button>
+    <h1>Hello!</h1>
+    <p>Please complete the captcha to proceed.</p>
+    <div class="captcha">
+      <div class="captcha-image">
+        <!-- Placeholder for the captcha image -->
+        <img src="captcha_image.jpg" alt="Captcha Image">
+      </div>
+      <input type="text" id="captchaInput" placeholder="Enter the captcha">
+      <button id="verifyButton">Verify</button>
+    </div>
   </main>
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const connectWalletButton = document.getElementById('connectWalletButton');
-      const mintButton = document.getElementById('mintButton');
-      let web3;
+    document.addEventListener('DOMContentLoaded', () => {
+      const captchaInput = document.getElementById('captchaInput');
+      const verifyButton = document.getElementById('verifyButton');
 
-      async function connectWallet() {
-        try {
-          await ethereum.request({ method: 'eth_requestAccounts' });
-          web3 = new Web3(ethereum);
-          mintButton.disabled = false;
-        } catch (error) {
-          console.error('Error connecting wallet:', error);
-        }
-      }
+      // Replace this with your own verification logic
+      verifyButton.addEventListener('click', () => {
+        const userInput = captchaInput.value;
+        const correctCaptcha = '123456'; // Replace with the correct captcha value
 
-      if (typeof ethereum !== 'undefined') {
-        connectWalletButton.addEventListener('click', connectWallet);
-      } else {
-        connectWalletButton.textContent = 'No Wallet Detected';
-      }
-
-      mintButton.addEventListener('click', async () => {
-        try {
-          const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your actual contract address
-          const contractABI = []; // Replace with your contract's ABI
-          const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-          const accounts = await web3.eth.getAccounts();
-          const account = accounts[0];
-
-          const result = await contract.methods.mintTokens().send({ from: account });
-
-          console.log('Minting result:', result);
-          // Handle success or update UI accordingly
-        } catch (error) {
-          console.error('Error minting tokens:', error);
-          // Handle error or update UI accordingly
+        if (userInput === correctCaptcha) {
+          window.location.href = 'welcome.html'; // Redirect to the welcome page
+        } else {
+          alert('Captcha verification failed. Please try again.');
         }
       });
     });
