@@ -3,32 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mint Tokens</title>
+    <title>Lucky Token Minting</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
 </head>
 <body>
-    <h1>Mint Tokens boob</h1>
+    <h1>Lucky Token Minting</h1>
+    <p>Click the button below to mint 1000 Lucky tokens by trading 1 HEX:</p>
+    <button id="mintButton">Mint Tokens</button>
 
     <script>
-        async function autoOpenMetaMask() {
-            if (typeof window.ethereum !== 'undefined') {
+        async function init() {
+            // Modern DApp browsers...
+            if (window.ethereum) {
+                window.web3 = new Web3(ethereum);
                 try {
-                    // Request access to MetaMask account
-                    await window.ethereum.enable();
-                    console.log('MetaMask is open and connected.');
-
-                    // You can now interact with MetaMask for minting tokens
-                    // For example, call the mint function of your contract here
+                    // Request account access if needed
+                    await ethereum.enable();
                 } catch (error) {
-                    console.error('Error opening MetaMask:', error);
+                    console.error('Access denied:', error);
                 }
-            } else {
-                console.error('MetaMask not detected.');
+            }
+            // Legacy DApp browsers...
+            else if (window.web3) {
+                window.web3 = new Web3(web3.currentProvider);
+            }
+            // Non-DApp browsers...
+            else {
+                console.error('Non-Ethereum browser detected. You should consider trying MetaMask!');
             }
         }
 
-        // Automatically open MetaMask on page load
-        window.addEventListener('load', autoOpenMetaMask);
+        async function mintTokens() {
+            try {
+                const hexContractAddress = '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39';
+                const hexContractABI = [ /* Replace with HEX contract ABI */ ];
+
+                const luckyContractAddress = '0x9725ebA772539b5C05D9DaA19B1a15cb51ce2621';
+                const luckyContractABI = [ /* Replace with Lucky contract ABI */ ];
+
+                const hexContract = new web3.eth.Contract(hexContractABI, hexContractAddress);
+                const luckyContract = new web3.eth.Contract(luckyContractABI, luckyContractAddress);
+
+                // Trade 1 HEX for 1000 Lucky tokens
+                const tradeTx = await hexContract.methods.trade(1000).send({ from: web3.eth.defaultAccount });
+
+                console.log('Trade transaction:', tradeTx);
+                alert('Trade successful! You have received 1000 Lucky tokens.');
+            } catch (error) {
+                console.error('Error minting tokens:', error);
+                alert('Error minting tokens. Please check your MetaMask connection and try again.');
+            }
+        }
+
+        window.onload = async () => {
+            await init();
+            const mintButton = document.getElementById('mintButton');
+            mintButton.onclick = mintTokens;
+        };
     </script>
 </body>
 </html>
