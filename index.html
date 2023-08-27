@@ -1,35 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Awesome Website</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        header {
-            background-color: #35424a;
-            color: white;
-            text-align: center;
-            padding: 1rem;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-    </style>
+    <title>Lucky Token Minting</title>
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Awesome Website poopy</h1>
-        <p>Your tagline or description goes here.</p>
-    </header>
-    <div class="container">
-        <h2>About Me</h2>
-        <p>This is where you can introduce yourself.</p>
+    <h1>Lucky Token Minting</h1>
+    <p>Connect your MetaMask wallet to mint Lucky tokens.</p>
+    
+    <button id="connectButton">Connect MetaMask</button>
+    
+    <div id="mintForm">
+        <input type="number" id="mintAmount" placeholder="Amount to Mint">
+        <button id="mintButton">Mint Tokens</button>
+    </div>
+    
+    <div id="balance">
+        Your Token Balance: <span id="tokenBalance">0</span>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js"></script>
+    <script>
+        const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your contract address
+        const contractABI = [/* Contract ABI here */]; // Replace with your contract's ABI
+        
+        const web3 = new Web3(window.ethereum);
+        
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+        
+        const connectButton = document.getElementById('connectButton');
+        const mintForm = document.getElementById('mintForm');
+        const mintAmount = document.getElementById('mintAmount');
+        const mintButton = document.getElementById('mintButton');
+        const tokenBalance = document.getElementById('tokenBalance');
+        
+        connectButton.addEventListener('click', async () => {
+            try {
+                await window.ethereum.enable();
+                const accounts = await web3.eth.getAccounts();
+                const sender = accounts[0];
+                
+                mintForm.style.display = 'block';
+                
+                const balance = await contract.methods.balanceOf(sender).call();
+                tokenBalance.textContent = web3.utils.fromWei(balance, 'ether');
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred while connecting to MetaMask.');
+            }
+        });
+        
+        mintButton.addEventListener('click', async () => {
+            try {
+                const accounts = await web3.eth.getAccounts();
+                const sender = accounts[0];
+                const amountToMint = web3.utils.toWei(mintAmount.value, 'ether');
+                
+                const result = await contract.methods.mintTokens(sender, amountToMint).send({ from: sender });
+                
+                console.log(result);
+                alert('Tokens minted successfully!');
+                
+                const balance = await contract.methods.balanceOf(sender).call();
+                tokenBalance.textContent = web3.utils.fromWei(balance, 'ether');
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred while minting tokens.');
+            }
+        });
+    </script>
+</body>
+</html>
+
 
         <h2>Contact Me</h2>
         <p>You can reach me at: your.email@example.com</p>
