@@ -3,33 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Index Page</title>
-  <style>
-    /* Basic styling for the page */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    main {
-      padding: 20px;
-      text-align: center;
-    }
-  </style>
+  <title>Welcome to My Site</title>
 </head>
 <body>
-  <main>
-    <h1>Welcome to the Index Page!</h1>
-    <p>Click the button to proceed to the welcome page.</p>
-    <button id="proceedButton">Proceed</button>
-  </main>
+  <h1>Welcome to My Site</h1>
+  <p>Click the button below to connect your MetaMask wallet to the PulseChain network.</p>
+  <button id="connectMetamask">Connect Metamask to PulseChain</button>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const proceedButton = document.getElementById('proceedButton');
-      
-      proceedButton.addEventListener('click', () => {
-        window.location.href = 'welcome.html'; // Redirect to the welcome page
+      const connectMetamaskButton = document.getElementById('connectMetamask');
+
+      connectMetamaskButton.addEventListener('click', async () => {
+        if (typeof window.ethereum !== 'undefined') {
+          try {
+            // Check if the PulseChain network is already added to MetaMask
+            const pulseChainNetwork = {
+              chainId: '0x171', // PulseChain Chain ID (369 in decimal)
+              chainName: 'PulseChain',
+              nativeCurrency: {
+                name: 'PLS',
+                symbol: 'PLS',
+                decimals: 18,
+              },
+              rpcUrls: ['https://rpc.pulsechain.com'],
+              blockExplorerUrls: ['https://otter.pulsechain.com'],
+            };
+
+            const chainId = '0x171'; // PulseChain Chain ID (369 in decimal)
+            const isPulseChainAdded = await ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [pulseChainNetwork],
+            });
+
+            if (isPulseChainAdded) {
+              console.log('PulseChain network added to MetaMask.');
+            }
+
+            // Request account access
+            await window.ethereum.request({
+              method: 'eth_requestAccounts',
+              params: [{ chainId: chainId }],
+            });
+
+            console.log('Connected to PulseChain network.');
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        } else {
+          console.error('MetaMask is not detected.');
+        }
       });
     });
   </script>
