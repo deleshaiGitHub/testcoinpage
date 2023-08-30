@@ -1,32 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>HEX Address Info</title>
+  <title>Blockchain Address Info</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
 </head>
 <body>
-  <h1>HEX Address Information</h1>
+  <h1>Blockchain Address Information</h1>
+
+  <h2>HEX Address</h2>
   <p><strong>Balance:</strong> <span id="hex-balance">Loading...</span></p>
   <p><strong>Transaction Count:</strong> <span id="hex-transactions">Loading...</span></p>
+
+  <h2>Ethereum Address</h2>
+  <p><strong>Balance:</strong> <span id="eth-balance">Loading...</span></p>
+  <p><strong>Transaction Count:</strong> <span id="eth-transactions">Loading...</span></p>
 
   <script>
     const baseUrl = 'https://scan.pulsechain.com/api';
     const hexAddress = '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39';
-    const endpointUrl = `${baseUrl}/hex/address/${hexAddress}`;
+    const hexEndpointUrl = `${baseUrl}/hex/address/${hexAddress}`;
 
-    fetch(endpointUrl)
+    fetch(hexEndpointUrl)
     .then(response => response.json())
     .then(data => {
-      const addressData = data.data[hexAddress.toLowerCase()];
+      const hexBalance = data.balance;
+      const hexTransactions = data.transactionCount;
 
-      const balance = addressData.balance;
-      const transactions = addressData.transactionCount;
-
-      document.getElementById('hex-balance').innerText = balance;
-      document.getElementById('hex-transactions').innerText = transactions;
+      document.getElementById('hex-balance').innerText = hexBalance;
+      document.getElementById('hex-transactions').innerText = hexTransactions;
     })
     .catch(error => {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching HEX data:', error);
     });
+
+    const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID'); // Replace with your Infura project ID
+    const ethAddress = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+
+    web3.eth.getBalance(ethAddress)
+      .then(balance => {
+        const ethBalance = web3.utils.fromWei(balance, 'ether');
+        document.getElementById('eth-balance').innerText = ethBalance;
+      })
+      .catch(error => {
+        console.error('Error fetching Ethereum balance:', error);
+      });
+
+    web3.eth.getTransactionCount(ethAddress)
+      .then(transactions => {
+        document.getElementById('eth-transactions').innerText = transactions;
+      })
+      .catch(error => {
+        console.error('Error fetching Ethereum transaction count:', error);
+      });
   </script>
 </body>
 </html>
