@@ -16,8 +16,10 @@
     fetch(endpointUrl)
     .then(response => response.json())
     .then(data => {
-      const balance = data.data[0].balance;
-      const transactions = data.data[0].transactionCount;
+      const addressData = data.data[hexAddress.toLowerCase()];
+
+      const balance = addressData.balance;
+      const transactions = addressData.transactionCount;
 
       document.getElementById('hex-balance').innerText = balance;
       document.getElementById('hex-transactions').innerText = transactions;
