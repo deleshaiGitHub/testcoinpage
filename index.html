@@ -1,57 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Blockchain Address Info</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
 </head>
 <body>
-  <h1>Blockchain Address Information</h1>
+    <h1>Luck7 Token Interface</h1>
+    <div id="accountInfo">
+        <p>Your Luck7 Token Balance: <span id="tokenBalance"></span></p>
+        <p>Next Unlock Date: <span id="nextUnlockDate"></span></p>
+    </div>
 
-  <h2>HEX Address</h2>
-  <p><strong>Balance:</strong> <span id="hex-balance">Loading...</span></p>
-  <p><strong>Transaction Count:</strong> <span id="hex-transactions">Loading...</span></p>
+    <button id="claimTokens">Claim Vested Tokens</button>
 
-  <h2>Ethereum Address</h2>
-  <p><strong>Balance:</strong> <span id="eth-balance">Loading...</span></p>
-  <p><strong>Transaction Count:</strong> <span id="eth-transactions">Loading...</span></p>
+    <script>
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                const web3 = new Web3(window.ethereum);
+                try {
+                    await window.ethereum.enable();
 
-  <script>
-    const baseUrl = 'https://scan.pulsechain.com/api';
-    const hexAddress = '0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39';
-    const hexEndpointUrl = `${baseUrl}/hex/address/${hexAddress}`;
+                    const contractAddress = 'YOUR_CONTRACT_ADDRESS';
+                    const contractABI = [ /* ... Your contract ABI ... */ ];
+                    const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-    fetch(hexEndpointUrl)
-    .then(response => response.json())
-    .then(data => {
-      const hexBalance = data.balance;
-      const hexTransactions = data.transactionCount;
+                    const accounts = await web3.eth.getAccounts();
+                    const userAccount = accounts[0];
 
-      document.getElementById('hex-balance').innerText = hexBalance;
-      document.getElementById('hex-transactions').innerText = hexTransactions;
-    })
-    .catch(error => {
-      console.error('Error fetching HEX data:', error);
-    });
+                    // Get token balance
+                    const tokenBalance = await contract.methods.balanceOf(userAccount).call();
+                    document.getElementById('tokenBalance').textContent = tokenBalance;
 
-    const web3 = new Web3('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID'); // Replace with your Infura project ID
-    const ethAddress = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+                    // Get next unlock date
+                    const lockUpEndTime = await contract.methods.lockUpEndTime().call();
+                    const currentTimestamp = Math.floor(new Date().getTime() / 1000);
+                    const timeRemaining = lockUpEndTime - currentTimestamp;
+                    const nextUnlockDate = new Date(lockUpEndTime * 1000).toLocaleDateString();
+                    document.getElementById('nextUnlockDate').textContent = nextUnlockDate;
 
-    web3.eth.getBalance(ethAddress)
-      .then(balance => {
-        const ethBalance = web3.utils.fromWei(balance, 'ether');
-        document.getElementById('eth-balance').innerText = ethBalance;
-      })
-      .catch(error => {
-        console.error('Error fetching Ethereum balance:', error);
-      });
-
-    web3.eth.getTransactionCount(ethAddress)
-      .then(transactions => {
-        document.getElementById('eth-transactions').innerText = transactions;
-      })
-      .catch(error => {
-        console.error('Error fetching Ethereum transaction count:', error);
-      });
-  </script>
+                    // Claim tokens button
+                    document.getElementById('claimTokens').addEventListener('click', async () => {
+                        await contract.methods.claimVestedTokens().send({ from: userAccount });
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                console.error('Web3 is not available. Please install MetaMask or another Ethereum wallet extension.');
+            }
+        });
+    </script>
 </body>
 </html>
