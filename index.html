@@ -1,53 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Live Streaming Platform</title>
 </head>
 <body>
-    <h1>Luck7 Token Interface</h1>
-    <div id="accountInfo">
-        <p>Your Luck7 Token Balance: <span id="tokenBalance"></span></p>
-        <p>Next Unlock Date: <span id="nextUnlockDate"></span></p>
-    </div>
-
-    <button id="claimTokens">Claim Vested Tokens</button>
-
-    <script>
-        window.addEventListener('load', async () => {
-            if (window.ethereum) {
-                const web3 = new Web3(window.ethereum);
-                try {
-                    await window.ethereum.enable();
-
-                    const contractAddress = 'YOUR_CONTRACT_ADDRESS';
-                    const contractABI = [ /* ... Your contract ABI ... */ ];
-                    const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-                    const accounts = await web3.eth.getAccounts();
-                    const userAccount = accounts[0];
-
-                    // Get token balance
-                    const tokenBalance = await contract.methods.balanceOf(userAccount).call();
-                    document.getElementById('tokenBalance').textContent = tokenBalance;
-
-                    // Get next unlock date
-                    const lockUpEndTime = await contract.methods.lockUpEndTime().call();
-                    const currentTimestamp = Math.floor(new Date().getTime() / 1000);
-                    const timeRemaining = lockUpEndTime - currentTimestamp;
-                    const nextUnlockDate = new Date(lockUpEndTime * 1000).toLocaleDateString();
-                    document.getElementById('nextUnlockDate').textContent = nextUnlockDate;
-
-                    // Claim tokens button
-                    document.getElementById('claimTokens').addEventListener('click', async () => {
-                        await contract.methods.claimVestedTokens().send({ from: userAccount });
-                    });
-                } catch (error) {
-                    console.error(error);
-                }
-            } else {
-                console.error('Web3 is not available. Please install MetaMask or another Ethereum wallet extension.');
-            }
-        });
-    </script>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Categories</a></li>
+                <li><a href="#">Live</a></li>
+                <!-- Add more navigation items as needed -->
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <!-- User profile, login/logout, and other actions -->
+        </div>
+    </header>
+    
+    <main>
+        <section class="featured-streams">
+            <!-- Featured live streams (thumbnails, titles, etc.) -->
+        </section>
+        <section class="top-creators">
+            <!-- Top content creators (usernames, profile pictures, stats) -->
+        </section>
+        <section class="trending-categories">
+            <!-- Trending categories or tags -->
+        </section>
+    </main>
+    
+    <footer>
+        <!-- Footer content -->
+    </footer>
 </body>
 </html>
