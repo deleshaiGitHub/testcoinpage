@@ -3,38 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>Live Streaming Platform</title>
+    <title>DApp Frontend</title>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Categories</a></li>
-                <li><a href="#">Live</a></li>
-                <!-- Add more navigation items as needed -->
-            </ul>
-        </nav>
-        <div class="user-actions">
-            <!-- User profile, login/logout, and other actions -->
-        </div>
-    </header>
+    <h1>Mint Luck7 Tokens</h1>
     
-    <main>
-        <section class="featured-streams">
-            <!-- Featured live streams (thumbnails, titles, etc.) -->
-        </section>
-        <section class="top-creators">
-            <!-- Top content creators (usernames, profile pictures, stats) -->
-        </section>
-        <section class="trending-categories">
-            <!-- Trending categories or tags -->
-        </section>
-    </main>
+    <!-- User input: Amount of payment tokens to use for minting -->
+    <label for="paymentAmount">Enter Payment Amount:</label>
+    <input type="number" id="paymentAmount" placeholder="Enter amount">
     
-    <footer>
-        <!-- Footer content -->
-    </footer>
+    <!-- Display calculated Luck7 token amount -->
+    <p id="luck7Amount">You will receive: 0 L7 tokens</p>
+    
+    <!-- Button to trigger minting -->
+    <button onclick="mintTokens()">Mint Luck7 Tokens</button>
+
+    <script src="script.js"></script>
 </body>
 </html>
