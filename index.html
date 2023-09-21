@@ -36,7 +36,7 @@
 
     <!-- Minting Form -->
     <form id="minting-form">
-        <label for="mint-amount">Amount of DAI or USDC to Trade:</label>
+        <label for="trade-amount">Amount of DAI or USDC to Trade:</label>
         <input type="number" id="trade-amount" required><br>
 
         <label for="token-select">Select Token for Trade:</label>
@@ -66,24 +66,30 @@
             // ... (Connect wallet code remains the same)
         }
 
-        async function mintTokens() {
-            const tradeAmount = document.getElementById('trade-amount').value;
+        function updateLuck7Amount() {
+            const tradeAmount = parseFloat(document.getElementById('trade-amount').value);
             const selectedToken = document.getElementById('token-select').value;
 
             // Validate the trade amount
             if (isNaN(tradeAmount) || tradeAmount <= 0) {
                 document.getElementById('exchange-rate').innerHTML = 'Invalid trade amount';
+                document.getElementById('result').innerHTML = '';
                 return;
             }
 
-            // Calculate the amount of Luck7 tokens to mint
+            // Calculate the amount of Luck7 tokens to be received
             const luck7Amount = tradeAmount * exchangeRate;
 
             // Display the exchange rate and amount of Luck7 tokens
             document.getElementById('exchange-rate').innerHTML = `1 ${selectedToken} = ${exchangeRate} Luck7`;
             document.getElementById('result').innerHTML = `You will receive ${luck7Amount} Luck7 tokens for ${tradeAmount} ${selectedToken}`;
+        }
 
-            // TODO: Implement the token minting logic here using Pulsechain's capabilities and the luck7ContractAddress
+        // Add an event listener to the input field to update in real-time
+        document.getElementById('trade-amount').addEventListener('input', updateLuck7Amount);
+
+        async function mintTokens() {
+            // This function can remain the same as in the previous example.
         }
     </script>
 </body>
