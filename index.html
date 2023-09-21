@@ -11,7 +11,7 @@
             font-size: 24px;
             margin-top: 50px;
         }
-        #open-metamask-button {
+        #open-wallet-button {
             background-color: gold;
             color: black;
             border: none;
@@ -25,27 +25,27 @@
 </head>
 <body>
     <div id="welcome-text">Welcome to Luck7</div>
-    <button id="open-metamask-button" onclick="openMetaMask()">Open MetaMask Wallet</button>
+    <button id="open-wallet-button" onclick="connectWallet()">Connect Wallet</button>
 
     <script>
-        function openMetaMask() {
+        async function connectWallet() {
             if (typeof window.ethereum !== 'undefined') {
-                // MetaMask is installed
-                window.ethereum.request({ method: 'eth_requestAccounts' })
-                    .then(accounts => {
-                        if (accounts.length > 0) {
-                            alert(`MetaMask wallet is connected.\nYour Ethereum address: ${accounts[0]}`);
-                        } else {
-                            alert('MetaMask wallet connection canceled.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error(error);
-                        alert('Error connecting to MetaMask wallet.');
-                    });
+                // Ethereum wallet provider detected
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        alert(`Wallet is connected.\nYour Ethereum address: ${accounts[0]}`);
+                    } else {
+                        alert('Wallet connection canceled.');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('Error connecting to the wallet.');
+                }
             } else {
-                // MetaMask is not installed
-                alert('MetaMask extension is not detected. Please install it to use this feature.');
+                // No Ethereum wallet provider detected
+                alert('No Ethereum wallet provider detected. Please install a compatible wallet extension or application.');
             }
         }
     </script>
