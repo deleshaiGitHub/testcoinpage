@@ -123,15 +123,32 @@
         }
 
         async function connectWallet() {
-            // ... (Connect wallet code remains the same)
+            // Your connect wallet code goes here
+            alert("Connect Wallet Function");
         }
 
         function updateLuck7Amount() {
-            // ... (Rest of the code for updating Luck7 amount remains the same)
+            const tradeAmount = parseFloat(document.getElementById('trade-amount').value);
+            const selectedToken = document.getElementById('token-select').value;
+
+            // Validate the trade amount
+            if (isNaN(tradeAmount) || tradeAmount <= 0) {
+                document.getElementById('exchange-rate').innerHTML = 'Invalid trade amount';
+                document.getElementById('result').innerHTML = '';
+                return;
+            }
+
+            // Calculate the amount of Luck7 tokens to be received
+            const luck7Amount = tradeAmount * exchangeRate;
+
+            // Display the exchange rate and amount of Luck7 tokens
+            document.getElementById('exchange-rate').innerHTML = `1 ${selectedToken} = ${exchangeRate} Luck7`;
+            document.getElementById('result').innerHTML = `You will receive ${luck7Amount} Luck7 tokens for ${tradeAmount} ${selectedToken}`;
         }
 
         async function mintTokens() {
-            // ... (Mint tokens function remains the same)
+            // Your mint tokens function goes here
+            alert("Mint Tokens Function");
         }
 
         // Event listener for the close button in the disclaimer popup
