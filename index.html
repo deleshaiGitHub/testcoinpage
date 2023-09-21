@@ -1,58 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Token Minting Interface</title>
+    <title>Welcome to Luck7</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #welcome-text {
+            font-size: 24px;
+            margin-top: 50px;
+        }
+        #open-metamask-button {
+            background-color: gold;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Token Minting Interface</h1>
-    
-    <!-- HTML form to collect token information -->
-    <form id="mintingForm">
-        <label for="tokenName">Token Name:</label>
-        <input type="text" id="tokenName" required><br>
-
-        <label for="tokenSymbol">Token Symbol:</label>
-        <input type="text" id="tokenSymbol" required><br>
-
-        <label for="tokenSupply">Token Supply:</label>
-        <input type="number" id="tokenSupply" required><br>
-
-        <button type="button" onclick="mintTokens()">Mint Tokens</button>
-    </form>
-
-    <div id="result"></div>
+    <div id="welcome-text">Welcome to Luck7</div>
+    <button id="open-metamask-button" onclick="openMetaMask()">Open MetaMask Wallet</button>
 
     <script>
-        // JavaScript code to interact with the blockchain
-        async function mintTokens() {
-            try {
-                // Connect to a blockchain (Ethereum in this example) using Web3.js
-                const web3 = new Web3('YOUR_ETHEREUM_NODE_URL');
-
-                // Get user's selected account from their wallet (e.g., MetaMask)
-                const accounts = await web3.eth.getAccounts();
-                const userAccount = accounts[0];
-
-                // User input from the HTML form
-                const tokenName = document.getElementById('tokenName').value;
-                const tokenSymbol = document.getElementById('tokenSymbol').value;
-                const tokenSupply = document.getElementById('tokenSupply').value;
-
-                // Smart contract ABI and address (replace with actual values)
-                const contractABI = [...];
-                const contractAddress = '0x...';
-
-                // Create a contract instance
-                const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-                // Call the smart contract's mint function
-                const result = await contract.methods.mintTokens(tokenName, tokenSymbol, tokenSupply).send({ from: userAccount });
-
-                // Display success message
-                document.getElementById('result').innerHTML = `Tokens minted successfully! Transaction hash: ${result.transactionHash}`;
-            } catch (error) {
-                // Handle errors and display error message
-                document.getElementById('result').innerHTML = `Error: ${error.message}`;
+        function openMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                // MetaMask is installed
+                window.ethereum.request({ method: 'eth_requestAccounts' })
+                    .then(accounts => {
+                        if (accounts.length > 0) {
+                            alert(`MetaMask wallet is connected.\nYour Ethereum address: ${accounts[0]}`);
+                        } else {
+                            alert('MetaMask wallet connection canceled.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert('Error connecting to MetaMask wallet.');
+                    });
+            } else {
+                // MetaMask is not installed
+                alert('MetaMask extension is not detected. Please install it to use this feature.');
             }
         }
     </script>
