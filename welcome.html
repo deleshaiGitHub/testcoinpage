@@ -1,27 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome Page</title>
-  <style>
-    /* Basic styling for the page */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    main {
-      padding: 20px;
-      text-align: center;
-    }
-  </style>
+    <title>Welcome to Luck7</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #welcome-text {
+            font-size: 24px;
+            margin-top: 50px;
+        }
+        #open-wallet-button {
+            background-color: gold;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        #minting-form {
+            margin-top: 30px;
+        }
+        select {
+            padding: 5px;
+        }
+    </style>
 </head>
 <body>
-  <main>
-    <h1>Welcome to the Party!</h1>
-    <p>Let's celebrate and have a great time!</p>
-  </main>
+    <div id="welcome-text">Welcome to Luck7</div>
+    <button id="open-wallet-button" onclick="connectWallet()">Connect Wallet</button>
+
+    <!-- Minting Form -->
+    <form id="minting-form">
+        <label for="mint-amount">Number of Luck7 Tokens to Mint:</label>
+        <input type="number" id="mint-amount" required><br>
+
+        <label for="token-select">Select Token for Trade:</label>
+        <select id="token-select">
+            <option value="PLS">PLS</option>
+        </select><br>
+
+        <button type="button" onclick="mintTokens()">Mint Tokens</button>
+    </form>
+
+    <div id="exchange-rate"></div>
+    <div id="result"></div>
+
+    <script>
+        // Current PLS price in USDC
+        const plsPriceInUsdc = 0.00004402;
+
+        async function connectWallet() {
+            // ... (Connect wallet code remains the same)
+        }
+
+        async function mintTokens() {
+            const mintAmount = document.getElementById('mint-amount').value;
+            const selectedToken = document.getElementById('token-select').value;
+
+            // Calculate exchange rate based on the current PLS price in USDC
+            const exchangeRate = 1 / plsPriceInUsdc; // Assuming 1 PLS = plsPriceInUsdc USDC
+
+            // Display the exchange rate
+            document.getElementById('exchange-rate').innerHTML = `Current Exchange Rate: 1 PLS = ${exchangeRate.toFixed(10)} USDC`;
+
+            // Calculate the amount of Luck7 tokens to mint
+            const luck7Amount = mintAmount * exchangeRate;
+
+            // TODO: Implement the token minting logic here
+
+            // Display result or error message
+            // document.getElementById('result').innerHTML = `Tokens minted successfully! Amount of Luck7 Tokens: ${luck7Amount}`;
+        }
+    </script>
 </body>
 </html>
