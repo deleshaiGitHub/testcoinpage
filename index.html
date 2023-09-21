@@ -6,6 +6,7 @@
         body {
             text-align: center;
             font-family: Arial, sans-serif;
+            background-color: #006400; /* Deep Green Background Color */
         }
         #welcome-text {
             font-size: 24px;
@@ -40,38 +41,56 @@
 
         <label for="token-select">Select Token for Trade:</label>
         <select id="token-select">
-            <option value="0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07">USDC</option>
-            <option value="0xefD766cCb38EaF1dfd701853BFCe31359239F305">DAI</option>
-            <option value="0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39">HEX</option>
-            <option value="0xA1077a294dDE1B09bB078844df40758a5D0f9a27">PLS</option>
+            <option value="USDC">USDC</option>
+            <option value="DAI">DAI</option>
         </select><br>
 
         <button type="button" onclick="mintTokens()">Mint Tokens</button>
     </form>
 
+    <div id="exchange-rate"></div>
     <div id="result"></div>
 
     <script>
+        // Simulated exchange rates for USDC and DAI (to Luck7)
+        const exchangeRates = {
+            USDC: 10, // Example rate: 10 USDC to 1 Luck7
+            DAI: 5,  // Example rate: 5 DAI to 1 Luck7
+        };
+
+        // Contract addresses for USDC and DAI on Pulsechain (replace with actual addresses)
+        const usdcContractAddress = '0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07';
+        const daiContractAddress = '0xefD766cCb38EaF1dfd701853BFCe31359239F305';
+
+        // Contract address for the Luck7 token on Pulsechain (replace with actual address)
+        const luck7ContractAddress = '0xDf6A16689A893095C721542e5d3CE55bBcc23aC6';
+
         async function connectWallet() {
             // ... (Connect wallet code remains the same)
         }
 
         async function mintTokens() {
-            // Get values from the minting form
             const mintAmount = document.getElementById('mint-amount').value;
             const selectedToken = document.getElementById('token-select').value;
 
-            // TODO: Replace the following lines with the actual smart contract interaction code
-            const contractAddress = '0xDf6A16689A893095C721542e5d3CE55bBcc23aC6'; // Replace with your real Luck7 contract address
-            // const abi = [...]; // Replace with your contract ABI
+            // Get the exchange rate for the selected token
+            const exchangeRate = exchangeRates[selectedToken];
 
-            // Connect to the contract using Web3.js or ethers.js
-            // const contract = new web3.eth.Contract(abi, contractAddress);
+            if (!exchangeRate) {
+                document.getElementById('exchange-rate').innerHTML = 'Invalid token selection';
+                return;
+            }
 
-            // TODO: Implement the token minting logic here
+            // Display the exchange rate
+            document.getElementById('exchange-rate').innerHTML = `Current Exchange Rate: 1 ${selectedToken} = ${exchangeRate} Luck7`;
+
+            // Calculate the amount of Luck7 tokens to mint
+            const luck7Amount = mintAmount / exchangeRate;
+
+            // TODO: Implement the token minting logic here using Pulsechain's capabilities and the luck7ContractAddress
 
             // Display result or error message
-            // document.getElementById('result').innerHTML = `Tokens minted successfully! Transaction hash: ${result.transactionHash}`;
+            // document.getElementById('result').innerHTML = `Tokens minted successfully! Amount of Luck7 Tokens: ${luck7Amount}`;
         }
     </script>
 </body>
