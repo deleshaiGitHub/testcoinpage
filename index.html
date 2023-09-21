@@ -1,23 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DApp Frontend</title>
+    <title>Token Minting Interface</title>
 </head>
 <body>
-    <h1>Mint Luck7 Tokens</h1>
+    <h1>Token Minting Interface</h1>
     
-    <!-- User input: Amount of payment tokens to use for minting -->
-    <label for="paymentAmount">Enter Payment Amount:</label>
-    <input type="number" id="paymentAmount" placeholder="Enter amount">
-    
-    <!-- Display calculated Luck7 token amount -->
-    <p id="luck7Amount">You will receive: 0 L7 tokens</p>
-    
-    <!-- Button to trigger minting -->
-    <button onclick="mintTokens()">Mint Luck7 Tokens</button>
+    <!-- HTML form to collect token information -->
+    <form id="mintingForm">
+        <label for="tokenName">Token Name:</label>
+        <input type="text" id="tokenName" required><br>
 
-    <script src="script.js"></script>
+        <label for="tokenSymbol">Token Symbol:</label>
+        <input type="text" id="tokenSymbol" required><br>
+
+        <label for="tokenSupply">Token Supply:</label>
+        <input type="number" id="tokenSupply" required><br>
+
+        <button type="button" onclick="mintTokens()">Mint Tokens</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        // JavaScript code to interact with the blockchain
+        async function mintTokens() {
+            try {
+                // Connect to a blockchain (Ethereum in this example) using Web3.js
+                const web3 = new Web3('YOUR_ETHEREUM_NODE_URL');
+
+                // Get user's selected account from their wallet (e.g., MetaMask)
+                const accounts = await web3.eth.getAccounts();
+                const userAccount = accounts[0];
+
+                // User input from the HTML form
+                const tokenName = document.getElementById('tokenName').value;
+                const tokenSymbol = document.getElementById('tokenSymbol').value;
+                const tokenSupply = document.getElementById('tokenSupply').value;
+
+                // Smart contract ABI and address (replace with actual values)
+                const contractABI = [...];
+                const contractAddress = '0x...';
+
+                // Create a contract instance
+                const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+                // Call the smart contract's mint function
+                const result = await contract.methods.mintTokens(tokenName, tokenSymbol, tokenSupply).send({ from: userAccount });
+
+                // Display success message
+                document.getElementById('result').innerHTML = `Tokens minted successfully! Transaction hash: ${result.transactionHash}`;
+            } catch (error) {
+                // Handle errors and display error message
+                document.getElementById('result').innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
 </body>
 </html>
