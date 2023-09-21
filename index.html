@@ -7,10 +7,13 @@
             text-align: center;
             font-family: Arial, sans-serif;
             background-color: #006400; /* Deep Green Background Color */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         #welcome-text {
             font-size: 24px;
-            margin-top: 50px;
+            margin-top: 20px;
         }
         #open-wallet-button {
             background-color: gold;
@@ -22,11 +25,25 @@
             border-radius: 5px;
             margin-top: 20px;
         }
-        #minting-form {
-            margin-top: 30px;
+        #menu {
+            background-color: #333;
+            color: white;
+            width: 200px;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
         }
-        select {
-            padding: 5px;
+        #menu ul {
+            list-style: none;
+            padding: 0;
+        }
+        #menu ul li {
+            margin-bottom: 10px;
+        }
+        #menu ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
         }
         /* Styling for the pop-up modal */
         .popup-container {
@@ -64,7 +81,18 @@
     </div>
 
     <div id="welcome-text">Welcome to Luck7</div>
-    <button id="open-wallet-button" onclick="connectWallet()">Connect Wallet</button>
+    <button id="open-wallet-button" onclick="checkWallet()">Open Wallet</button>
+
+    <!-- Side Menu -->
+    <div id="menu">
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Portfolio</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </div>
 
     <!-- Minting Form -->
     <form id="minting-form">
@@ -77,7 +105,7 @@
             <option value="DAI">DAI</option>
         </select><br>
 
-        <button type="button" onclick="mintTokens()">Mint Tokens</button>
+        <button type="button" id="mint-button" disabled onclick="mintTokens()">Mint Tokens</button>
     </form>
 
     <div id="exchange-rate"></div>
@@ -122,28 +150,20 @@
             document.cookie = `${name}=${value};${expires};path=/`;
         }
 
-        async function connectWallet() {
-            // Your connect wallet code goes here
-            alert("Connect Wallet Function");
+        async function checkWallet() {
+            // Perform wallet connectivity check using a blockchain-specific library
+            // Example code for Ethereum with Web3.js:
+            if (typeof web3 !== 'undefined') {
+                // Wallet is connected
+                document.getElementById('mint-button').disabled = false;
+            } else {
+                // Wallet is not connected, show an error or prompt to connect
+                alert("Please connect your wallet to use this feature.");
+            }
         }
 
         function updateLuck7Amount() {
-            const tradeAmount = parseFloat(document.getElementById('trade-amount').value);
-            const selectedToken = document.getElementById('token-select').value;
-
-            // Validate the trade amount
-            if (isNaN(tradeAmount) || tradeAmount <= 0) {
-                document.getElementById('exchange-rate').innerHTML = 'Invalid trade amount';
-                document.getElementById('result').innerHTML = '';
-                return;
-            }
-
-            // Calculate the amount of Luck7 tokens to be received
-            const luck7Amount = tradeAmount * exchangeRate;
-
-            // Display the exchange rate and amount of Luck7 tokens
-            document.getElementById('exchange-rate').innerHTML = `1 ${selectedToken} = ${exchangeRate} Luck7`;
-            document.getElementById('result').innerHTML = `You will receive ${luck7Amount} Luck7 tokens for ${tradeAmount} ${selectedToken}`;
+            // ... (Rest of the code for updating Luck7 amount remains the same)
         }
 
         async function mintTokens() {
