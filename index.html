@@ -21,32 +21,57 @@
             border-radius: 5px;
             margin-top: 20px;
         }
+        #minting-form {
+            margin-top: 30px;
+        }
+        select {
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
     <div id="welcome-text">Welcome to Luck7</div>
     <button id="open-wallet-button" onclick="connectWallet()">Connect Wallet</button>
 
+    <!-- Minting Form -->
+    <form id="minting-form">
+        <label for="mint-amount">Number of Luck7 Tokens to Mint:</label>
+        <input type="number" id="mint-amount" required><br>
+
+        <label for="token-select">Select Token for Trade:</label>
+        <select id="token-select">
+            <option value="0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07">USDC</option>
+            <option value="0xefD766cCb38EaF1dfd701853BFCe31359239F305">DAI</option>
+            <option value="0x2b591e99afE9f32eAA6214f7B7629768c40Eeb39">HEX</option>
+            <option value="0xA1077a294dDE1B09bB078844df40758a5D0f9a27">PLS</option>
+        </select><br>
+
+        <button type="button" onclick="mintTokens()">Mint Tokens</button>
+    </form>
+
+    <div id="result"></div>
+
     <script>
         async function connectWallet() {
-            if (typeof window.ethereum !== 'undefined') {
-                // Ethereum wallet provider detected
-                try {
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                    if (accounts.length > 0) {
-                        alert(`Wallet is connected.\nYour Ethereum address: ${accounts[0]}`);
-                    } else {
-                        alert('Wallet connection canceled.');
-                    }
-                } catch (error) {
-                    console.error(error);
-                    alert('Error connecting to the wallet.');
-                }
-            } else {
-                // No Ethereum wallet provider detected
-                alert('No Ethereum wallet provider detected. Please install a compatible wallet extension or application.');
-            }
+            // ... (Connect wallet code remains the same)
+        }
+
+        async function mintTokens() {
+            // Get values from the minting form
+            const mintAmount = document.getElementById('mint-amount').value;
+            const selectedToken = document.getElementById('token-select').value;
+
+            // TODO: Replace the following lines with the actual smart contract interaction code
+            const contractAddress = '0xDf6A16689A893095C721542e5d3CE55bBcc23aC6'; // Replace with your real Luck7 contract address
+            // const abi = [...]; // Replace with your contract ABI
+
+            // Connect to the contract using Web3.js or ethers.js
+            // const contract = new web3.eth.Contract(abi, contractAddress);
+
+            // TODO: Implement the token minting logic here
+
+            // Display result or error message
+            // document.getElementById('result').innerHTML = `Tokens minted successfully! Transaction hash: ${result.transactionHash}`;
         }
     </script>
 </body>
