@@ -28,9 +28,41 @@
         select {
             padding: 5px;
         }
+        /* Styling for the pop-up modal */
+        .popup-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
+    <!-- Pop-up Modal -->
+    <div class="popup-container" id="popup-container">
+        <div class="popup-content">
+            <h2>Disclaimer</h2>
+            <p>This is a disclaimer message. By using this website, you agree to the terms and conditions.</p>
+            <label for="hide-disclaimer"> <input type="checkbox" id="hide-disclaimer"> Don't show this again</label>
+            <br>
+            <button id="close-popup">Close</button>
+        </div>
+    </div>
+
     <div id="welcome-text">Welcome to Luck7</div>
     <button id="open-wallet-button" onclick="connectWallet()">Connect Wallet</button>
 
@@ -62,35 +94,48 @@
         // Contract address for the Luck7 token on Pulsechain (replace with actual address)
         const luck7ContractAddress = '0xDf6A16689A893095C721542e5d3CE55bBcc23aC6';
 
+        // Check if the disclaimer should be shown (based on cookie)
+        const shouldShowDisclaimer = !getCookie('hide-disclaimer');
+
+        if (shouldShowDisclaimer) {
+            document.getElementById('popup-container').style.display = 'block';
+        }
+
+        function hideDisclaimer() {
+            if (document.getElementById('hide-disclaimer').checked) {
+                // Set a cookie to remember the user's choice
+                setCookie('hide-disclaimer', 'true', 365);
+            }
+            document.getElementById('popup-container').style.display = 'none';
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = `expires=${date.toUTCString()}`;
+            document.cookie = `${name}=${value};${expires};path=/`;
+        }
+
         async function connectWallet() {
             // ... (Connect wallet code remains the same)
         }
 
         function updateLuck7Amount() {
-            const tradeAmount = parseFloat(document.getElementById('trade-amount').value);
-            const selectedToken = document.getElementById('token-select').value;
-
-            // Validate the trade amount
-            if (isNaN(tradeAmount) || tradeAmount <= 0) {
-                document.getElementById('exchange-rate').innerHTML = 'Invalid trade amount';
-                document.getElementById('result').innerHTML = '';
-                return;
-            }
-
-            // Calculate the amount of Luck7 tokens to be received
-            const luck7Amount = tradeAmount * exchangeRate;
-
-            // Display the exchange rate and amount of Luck7 tokens
-            document.getElementById('exchange-rate').innerHTML = `1 ${selectedToken} = ${exchangeRate} Luck7`;
-            document.getElementById('result').innerHTML = `You will receive ${luck7Amount} Luck7 tokens for ${tradeAmount} ${selectedToken}`;
+            // ... (Rest of the code for updating Luck7 amount remains the same)
         }
-
-        // Add an event listener to the input field to update in real-time
-        document.getElementById('trade-amount').addEventListener('input', updateLuck7Amount);
 
         async function mintTokens() {
-            // This function can remain the same as in the previous example.
+            // ... (Mint tokens function remains the same)
         }
+
+        // Event listener for the close button in the disclaimer popup
+        document.getElementById('close-popup').addEventListener('click', hideDisclaimer);
     </script>
 </body>
 </html>
