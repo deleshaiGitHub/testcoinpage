@@ -1,120 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mint Tokens</title>
-    <script src="https://cdn.ethers.io/lib/ethers-5.4.umd.min.js"></script>
-
+    <title>Minting Page</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.4.4/ethers.min.js"></script>
 </head>
 <body>
     <h1>Mint Tokens</h1>
-    <p>Enter the amount of tokens to mint:</p>
-    <input type="number" id="amountInput" placeholder="Amount">
     <button onclick="mintTokens()">Mint Tokens</button>
-    
     <script>
-        // Replace with your contract address and ABI
-        const contractAddress = "0x24666aa69c79C6bda576be143819B3f15356e797";
-        const contractABI = [
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "from",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "to",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "uint256",
-                        "name": "value",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "Transfer",
-                "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "account",
-                        "type": "address"
-                    }
-                ],
-                "name": "balanceOf",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "totalSupply",
-                "outputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "to",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "value",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "transfer",
-                "outputs": [
-                    {
-                        "internalType": "bool",
-                        "name": "",
-                        "type": "bool"
-                    }
-                ],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            }
-        ];
-
         async function mintTokens() {
-            const amount = document.getElementById("amountInput").value;
-            if (!amount) {
-                alert("Please enter the amount to mint.");
-                return;
+            // Connect to MetaMask provider
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+            try {
+                // Check if MetaMask is connected
+                const network = await provider.getNetwork();
+                if (network.chainId !== 943) { // Replace 943 with your desired chain ID
+                    throw new Error("Please connect to the correct network.");
+                }
+
+                // Initialize a signer
+                const signer = provider.getSigner();
+
+                // Replace with your contract's address
+                const contractAddress = "0x24666aa69c79C6bda576be143819B3f15356e797"; // Your contract's address
+                // Use the provided contract ABI
+                const contractABI = [
+                    {
+                        "anonymous": false,
+                        "inputs": [
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "from",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": true,
+                                "internalType": "address",
+                                "name": "to",
+                                "type": "address"
+                            },
+                            {
+                                "indexed": false,
+                                "internalType": "uint256",
+                                "name": "value",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "Transfer",
+                        "type": "event"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "account",
+                                "type": "address"
+                            }
+                        ],
+                        "name": "balanceOf",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "totalSupply",
+                        "outputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "inputs": [
+                            {
+                                "internalType": "address",
+                                "name": "to",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "value",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "transfer",
+                        "outputs": [
+                            {
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }
+                        ],
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    }
+                    // Add the rest of your contract ABI here
+                ];
+
+                // Create a contract instance
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+                // Mint tokens (adjust the amount as needed)
+                const amountToMint = ethers.utils.parseUnits("1", "ether"); // Mint 1 token (assuming 18 decimal places)
+                const tx = await contract.mint(amountToMint);
+                await tx.wait();
+
+                console.log("Tokens minted successfully.");
+            } catch (error) {
+                console.error("Error minting tokens:", error);
             }
-
-            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-            const from = accounts[0];
-
-            const contract = new ethers.Contract(contractAddress, contractABI, ethereum);
-            const tx = await contract.transfer(from, amount);
-            await tx.wait();
-
-            alert(`Minted ${amount} tokens to your address: ${from}`);
         }
     </script>
 </body>
