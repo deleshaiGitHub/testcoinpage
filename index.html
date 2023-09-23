@@ -108,7 +108,8 @@
                 ], tokenAddress);
 
                 // Check allowance
-                const allowance = await erc20Token.methods.allowance(userAddress, contractAddress).call();
+                // Check allowance
+                 const allowance = await erc20Token.methods.allowance().call();
                 if (allowance < mintAmount) {
                     // Approve the contract to spend tokens
                     await erc20Token.methods.approve(contractAddress, mintAmount).send({ from: userAddress });
