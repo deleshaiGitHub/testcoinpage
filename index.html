@@ -11,18 +11,20 @@
             height: 100vh;
             margin: 0;
         }
-        #connect-button {
+        #connect-button, #mint-button {
             background-color: gold;
             color: black;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-right: 20px;
         }
     </style>
 </head>
 <body>
     <button id="connect-button" onclick="connectWallet()">Connect Wallet</button>
+    <button id="mint-button" onclick="mintTokens()">Mint Token</button>
     <script>
         async function connectWallet() {
             // Check if MetaMask is installed and connected
@@ -39,6 +41,52 @@
                 }
             } else {
                 alert('MetaMask is not installed. Please install MetaMask and try again.');
+            }
+        }
+
+        async function mintTokens() {
+            // Check if MetaMask is connected
+            if (window.ethereum) {
+                try {
+                    // Create a contract instance for the token
+                    const contractAddress = "0x24666aa69c79C6bda576be143819B3f15356e797"; // Replace with your contract's address
+                    const contractABI = [
+                        {
+                            "inputs": [
+                                {
+                                    "internalType": "uint256",
+                                    "name": "amount",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "name": "mint",
+                            "outputs": [],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        }
+                    ];
+
+                    // Initialize web3 provider
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+                    // Get signer
+                    const signer = provider.getSigner();
+
+                    // Create a contract instance
+                    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+                    // Mint 1 token (assuming 18 decimal places)
+                    const amountToMint = ethers.utils.parseUnits("1", "ether");
+                    const tx = await contract.mint(amountToMint);
+                    await tx.wait();
+
+                    alert('Token minted successfully!');
+                } catch (error) {
+                    console.error(error);
+                    alert('Failed to mint token. Please make sure you are connected to the correct network and have sufficient funds.');
+                }
+            } else {
+                alert('MetaMask is not installed or not connected. Please connect your wallet and try again.');
             }
         }
     </script>
