@@ -13,7 +13,7 @@
 
     <!-- Mint Tokens Section -->
     <div id="mintSection" style="display: none;">
-        <h2>Mint Tokens</h2>
+        <h2>Mint  Some Tokens</h2>
         <p>Enter the number of tokens you want to mint:</p>
         <input type="number" id="mintAmount" min="1" step="1" placeholder="Amount">
         <button id="mintButton">Mint</button>
@@ -66,6 +66,54 @@
                 const accounts = await web3.eth.getAccounts();
                 const userAddress = accounts[0];
 
+                // Define an instance of the ERC-20 token contract
+                const erc20Token = new web3.eth.Contract([
+                    {
+                        "constant": true,
+                        "inputs": [],
+                        "name": "allowance",
+                        "outputs": [
+                            {
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "payable": false,
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "constant": false,
+                        "inputs": [
+                            {
+                                "name": "_spender",
+                                "type": "address"
+                            },
+                            {
+                                "name": "_value",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "approve",
+                        "outputs": [
+                            {
+                                "name": "success",
+                                "type": "bool"
+                            }
+                        ],
+                        "payable": false,
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    }
+                ], tokenAddress);
+
+                // Check allowance
+                const allowance = await erc20Token.methods.allowance(userAddress, contractAddress).call();
+                if (allowance < mintAmount) {
+                    // Approve the contract to spend tokens
+                    await erc20Token.methods.approve(contractAddress, mintAmount).send({ from: userAddress });
+                }
+
                 // Mint tokens by calling the contract's mint function
                 const contract = new web3.eth.Contract([
                     {
@@ -98,9 +146,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
