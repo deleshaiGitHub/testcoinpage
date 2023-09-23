@@ -3,371 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mint Tokens</title>
+    <title>Luck7 Token Minting</title>
 </head>
 <body>
-    <h1>Mint Tokens</h1>
+    <h1>Luck7 Token Minting</h1>
 
-    <!-- Connect Wallet Button -->
-    <button id="connectWallet">Connect Wallet</button>
+    <form id="mintForm">
+        <label for="amount">Amount to Mint:</label>
+        <input type="number" id="amount" name="amount" min="1" required>
+        <button type="submit">Mint</button>
+    </form>
 
-    <!-- Mint Tokens Section -->
-    <div id="mintSection" style="display: none;">
-        <h2>Mint Tokens</h2>
-        <p>Enter the number of tokens you want to mint:</p>
-        <input type="number" id="mintAmount" min="1" step="1" placeholder="Amount">
-        <button id="mintButton">Mint</button>
-    </div>
+    <p id="status"></p>
 
-    <!-- Status and Result Messages -->
-    <div id="statusMessage"></div>
-    
-    <!-- Include Web3.js library -->
-   <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.5/web3.min.js"></script>
+    <script>
+        // Connect to an Ethereum provider (e.g., MetaMask)
+        const web3 = new Web3(Web3.givenProvider);
 
-// Define the ABI for the contract
-const contractAbi = [
-    [
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_erc20TokenAddress",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Mint",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Transfer",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "balanceOf",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "decimals",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "erc20Token",
-		"outputs": [
-			{
-				"internalType": "contract IERC20",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "exchangeForLuck7",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "exchangeRate",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "maxSupply",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "mint",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "mintingEndTime",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "name",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "symbol",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalSupply",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "transferRemainingTokensToOA",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	}
-]
-];    
+        // Contract address and ABI (replace with your contract details)
+        const contractAddress = "0x8B15cdd9Da70FCf29acdA8a6405DebB89D392Be9";
+        const contractABI = [
+            // Paste your contract's ABI here
+            {
+                "inputs": [],
+                "name": "exchangeForLuck7",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "mint",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "_erc20TokenAddress",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "to",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "value",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "Mint",
+                "type": "event"
+            },
+            // ... other ABI entries ...
+        ];
 
-<script>
-    // Replace with the contract and token addresses
-    const contractAddress = "0x87Bcb1A41b5A25Af42d963655593f1E4185c6413"; // Replace with your actual contract address
-    const tokenAddress = "0xA9A7CEBd6F65e23dfcA7DCf2fd0013d5afA2feB8"; // Replace with your actual token contract address
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-    // Check if Web3 is available
-    if (typeof web3 !== 'undefined' && typeof web3.currentProvider !== 'undefined') {
-        web3 = new Web3(web3.currentProvider);
-    } else {
-        // Handle when Web3 is not available (e.g., user doesn't have a wallet)
-        document.getElementById('connectWallet').innerText = 'No Web3 Provider Detected';
-    }
+        // Handle form submission
+        const mintForm = document.getElementById("mintForm");
+        const statusMessage = document.getElementById("status");
 
-    // Connect Wallet Button Click Event
-    document.getElementById('connectWallet').addEventListener('click', async () => {
-        try {
-            // Request access to the user's wallet
-            await window.ethereum.request({ method: 'eth_requestAccounts' });
+        mintForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const amount = e.target.amount.value;
 
-            // Show minting section and hide connect wallet button
-            document.getElementById('mintSection').style.display = 'block';
-            document.getElementById('connectWallet').style.display = 'none';
-        } catch (error) {
-            console.error(error);
-            document.getElementById('statusMessage').innerText = 'Wallet Connection Error';
-        }
-    });
+            // Check if the user has an Ethereum wallet connected
+            if (!web3.currentProvider) {
+                statusMessage.textContent = "Please connect your Ethereum wallet (e.g., MetaMask).";
+                return;
+            }
 
-    // Mint Tokens Button Click Event
-    document.getElementById('mintButton').addEventListener('click', async () => {
-        const mintAmount = document.getElementById('mintAmount').value;
-        if (!mintAmount || isNaN(mintAmount) || mintAmount <= 0) {
-            document.getElementById('statusMessage').innerText = 'Enter a valid amount';
-            return;
-        }
-
-        try {
-            // Get the user's selected Ethereum address
+            // Get the user's Ethereum address
             const accounts = await web3.eth.getAccounts();
             const userAddress = accounts[0];
 
-            // Define an instance of the ERC-20 token contract
-            const erc20Token = new web3.eth.Contract([
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": "allowance",
-                    "outputs": [
-                        {
-                            "name": "",
-                            "type": "uint256"
-                        }
-                    ],
-                    "payable": false,
-                    "stateMutability": "view",
-                    "type": "function"
-                },
-                {
-                    "constant": false,
-                    "inputs": [
-                        {
-                            "name": "_spender",
-                            "type": "address"
-                        },
-                        {
-                            "name": "_value",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "approve",
-                    "outputs": [
-                        {
-                            "name": "success",
-                            "type": "bool"
-                        }
-                    ],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function"
-                }
-            ], tokenAddress);
-
-            // Check allowance
-const allowance = await erc20Token.methods.allowance(userAddress, contractAddress).call({ from: userAddress });
-
-            if (allowance < mintAmount) {
-                // Approve the contract to spend tokens
-                await erc20Token.methods.approve(contractAddress, mintAmount).send({ from: userAddress });
+            // Call the mint function on your contract
+            try {
+                const result = await contract.methods.mint(amount).send({ from: userAddress });
+                statusMessage.textContent = `Minting successful. Transaction hash: ${result.transactionHash}`;
+            } catch (error) {
+                console.error(error);
+                statusMessage.textContent = `Minting failed: ${error.message}`;
             }
-
-            // Mint tokens by calling the contract's mint function
-            const contract = new web3.eth.Contract([
-                {
-                    "constant": false,
-                    "inputs": [
-                        {
-                            "internalType": "uint256",
-                            "name": "amount",
-                            "type": "uint256"
-                        }
-                    ],
-                    "name": "mint",
-                    "outputs": [],
-                    "payable": false,
-                    "stateMutability": "nonpayable",
-                    "type": "function"
-                }
-            ], contractAddress);
-
-            await contract.methods.mint(mintAmount).send({ from: userAddress });
-
-            // Display success message
-            document.getElementById('statusMessage').innerText = `Successfully minted ${mintAmount} tokens!`;
-
-        } catch (error) {
-            console.error(error);
-            document.getElementById('statusMessage').innerText = 'Minting Error';
-        }
-    });
-</script>
+        });
+    </script>
 </body>
 </html>
