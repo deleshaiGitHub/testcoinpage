@@ -1,178 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Welcome to Luck7</title>
-    <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: #006400; /* Deep Green Background Color */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #welcome-text {
-            font-size: 24px;
-            margin-top: 20px;
-        }
-        #open-wallet-button {
-            background-color: gold;
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-        #menu {
-            background-color: #333;
-            color: white;
-            width: 200px;
-            padding: 20px;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-        #menu ul {
-            list-style: none;
-            padding: 0;
-        }
-        #menu ul li {
-            margin-bottom: 10px;
-        }
-        #menu ul li a {
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-        }
-        /* Styling for the pop-up modal */
-        .popup-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 999;
-        }
-        .popup-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mint Tokens</title>
 </head>
 <body>
-    <!-- Pop-up Modal -->
-    <div class="popup-container" id="popup-container">
-        <div class="popup-content">
-            <h2>Disclaimer</h2>
-            <p>This is a disclaimer message. By using this website, you agree to the terms and conditions.</p>
-            <label for="hide-disclaimer"> <input type="checkbox" id="hide-disclaimer"> Don't show this again</label>
-            <br>
-            <button id="close-popup">Close</button>
-        </div>
+    <h1>Mint Tokens</h1>
+
+    <!-- Connect Wallet Button -->
+    <button id="connectWallet">Connect Wallet</button>
+
+    <!-- Mint Tokens Section -->
+    <div id="mintSection" style="display: none;">
+        <h2>Mint Tokens</h2>
+        <p>Enter the number of tokens you want to mint:</p>
+        <input type="number" id="mintAmount" min="1" step="1" placeholder="Amount">
+        <button id="mintButton">Mint</button>
     </div>
 
-    <div id="welcome-text">Welcome to Luck7</div>
-    <button id="open-wallet-button" onclick="checkWallet()">Open Wallet</button>
-
-    <!-- Side Menu -->
-    <div id="menu">
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Portfolio</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-    </div>
-
-    <!-- Minting Form -->
-    <form id="minting-form">
-        <label for="trade-amount">Amount of DAI or USDC to Trade:</label>
-        <input type="number" id="trade-amount" required><br>
-
-        <label for="token-select">Select Token for Trade:</label>
-        <select id="token-select">
-            <option value="USDC">USDC</option>
-            <option value="DAI">DAI</option>
-        </select><br>
-
-        <button type="button" id="mint-button" disabled onclick="mintTokens()">Mint Tokens</button>
-    </form>
-
-    <div id="exchange-rate"></div>
-    <div id="result"></div>
+    <!-- Status and Result Messages -->
+    <div id="statusMessage"></div>
+    
+    <!-- Include Web3.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
 
     <script>
-        // Fixed exchange rate for DAI and USDC to Luck7
-        const exchangeRate = 1000; // 1 DAI or USDC = 1000 Luck7
+        // Replace with the contract and token addresses
+        const contractAddress = "0x87Bcb1A41b5A25Af42d963655593f1E4185c6413";
+        const tokenAddress = "0xA9A7CEBd6F65e23dfcA7DCf2fd0013d5afA2feB8";
 
-        // Contract addresses for USDC and DAI on Pulsechain (replace with actual addresses)
-        const usdcContractAddress = '0x15D38573d2feeb82e7ad5187aB8c1D52810B1f07';
-        const daiContractAddress = '0xefD766cCb38EaF1dfd701853BFCe31359239F305';
-
-        // Contract address for the Luck7 token on Pulsechain (replace with actual address)
-        const luck7ContractAddress = '0xDf6A16689A893095C721542e5d3CE55bBcc23aC6';
-
-        // Check if the disclaimer should be shown (based on cookie)
-        const shouldShowDisclaimer = !getCookie('hide-disclaimer');
-
-        if (shouldShowDisclaimer) {
-            document.getElementById('popup-container').style.display = 'block';
+        // Check if Web3 is available
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // Handle when Web3 is not available (e.g., user doesn't have a wallet)
+            document.getElementById('connectWallet').innerText = 'No Web3 Provider Detected';
         }
 
-        function hideDisclaimer() {
-            if (document.getElementById('hide-disclaimer').checked) {
-                // Set a cookie to remember the user's choice
-                setCookie('hide-disclaimer', 'true', 365);
+        // Connect Wallet Button Click Event
+        document.getElementById('connectWallet').addEventListener('click', async () => {
+            try {
+                // Request access to the user's wallet
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                // Show minting section and hide connect wallet button
+                document.getElementById('mintSection').style.display = 'block';
+                document.getElementById('connectWallet').style.display = 'none';
+            } catch (error) {
+                console.error(error);
+                document.getElementById('statusMessage').innerText = 'Wallet Connection Error';
             }
-            document.getElementById('popup-container').style.display = 'none';
-        }
+        });
 
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
-
-        function setCookie(name, value, days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            const expires = `expires=${date.toUTCString()}`;
-            document.cookie = `${name}=${value};${expires};path=/`;
-        }
-
-        async function checkWallet() {
-            // Perform wallet connectivity check using a blockchain-specific library
-            // Example code for Ethereum with Web3.js:
-            if (typeof web3 !== 'undefined') {
-                // Wallet is connected
-                document.getElementById('mint-button').disabled = false;
-            } else {
-                // Wallet is not connected, show an error or prompt to connect
-                alert("Please connect your wallet to use this feature.");
+        // Mint Tokens Button Click Event
+        document.getElementById('mintButton').addEventListener('click', async () => {
+            const mintAmount = document.getElementById('mintAmount').value;
+            if (!mintAmount || isNaN(mintAmount) || mintAmount <= 0) {
+                document.getElementById('statusMessage').innerText = 'Enter a valid amount';
+                return;
             }
-        }
 
-        function updateLuck7Amount() {
-            // ... (Rest of the code for updating Luck7 amount remains the same)
-        }
+            try {
+                // Get the user's selected Ethereum address
+                const accounts = await web3.eth.getAccounts();
+                const userAddress = accounts[0];
 
-        async function mintTokens() {
-            // Your mint tokens function goes here
-            alert("Mint Tokens Function");
-        }
+                // Mint tokens by calling the contract's mint function
+                const contract = new web3.eth.Contract([], contractAddress);
+                await contract.methods.mint(mintAmount).send({ from: userAddress });
 
-        // Event listener for the close button in the disclaimer popup
-        document.getElementById('close-popup').addEventListener('click', hideDisclaimer);
+                // Display success message
+                document.getElementById('statusMessage').innerText = `Successfully minted ${mintAmount} tokens!`;
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('statusMessage').innerText = 'Minting Error';
+            }
+        });
     </script>
 </body>
 </html>
