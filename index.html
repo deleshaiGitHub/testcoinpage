@@ -1,1 +1,148 @@
-e
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mint Tokens</title>
+</head>
+<body>
+    <h1>Mint Tokens</h1>
+
+    <!-- Connect Wallet Button -->
+    <button id="connectWallet">Connect Wallet</button>
+
+    <!-- Mint Tokens Section -->
+    <div id="mintSection" style="display: none;">
+        <h2>Mint Tokens</h2>
+        <p>Enter the number of tokens you want to mint:</p>
+        <input type="number" id="mintAmount" min="1" step="1" placeholder="Amount">
+        <button id="mintButton">Mint</button>
+    </div>
+
+    <!-- Status and Result Messages -->
+    <div id="statusMessage"></div>
+    
+    <!-- Include Web3.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+
+    <script>
+        // Replace with the contract and token addresses
+        const contractAddress = "0x87Bcb1A41b5A25Af42d963655593f1E4185c6413"; // Replace with your actual contract address
+        const tokenAddress = "0xA9A7CEBd6F65e23dfcA7DCf2fd0013d5afA2feB8"; // Replace with your actual token contract address
+
+        // Check if Web3 is available
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(window.ethereum);
+        } else {
+            // Handle when Web3 is not available (e.g., user doesn't have a wallet)
+            document.getElementById('connectWallet').innerText = 'No Web3 Provider Detected';
+        }
+
+        // Connect Wallet Button Click Event
+        document.getElementById('connectWallet').addEventListener('click', async () => {
+            try {
+                // Request access to the user's wallet
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                // Show minting section and hide connect wallet button
+                document.getElementById('mintSection').style.display = 'block';
+                document.getElementById('connectWallet').style.display = 'none';
+            } catch (error) {
+                console.error(error);
+                document.getElementById('statusMessage').innerText = 'Wallet Connection Error';
+            }
+        });
+
+        // Mint Tokens Button Click Event
+        document.getElementById('mintButton').addEventListener('click', async () => {
+            const mintAmount = document.getElementById('mintAmount').value;
+            if (!mintAmount || isNaN(mintAmount) || mintAmount <= 0) {
+                document.getElementById('statusMessage').innerText = 'Enter a valid amount';
+                return;
+            }
+
+            try {
+                // Get the user's selected Ethereum address
+                const accounts = await web3.eth.getAccounts();
+                const userAddress = accounts[0];
+
+                // Define an instance of the ERC-20 token contract
+                const erc20Token = new web3.eth.Contract([
+                    {
+                        "constant": true,
+                        "inputs": [],
+                        "name": "allowance",
+                        "outputs": [
+                            {
+                                "name": "",
+                                "type": "uint256"
+                            }
+                        ],
+                        "payable": false,
+                        "stateMutability": "view",
+                        "type": "function"
+                    },
+                    {
+                        "constant": false,
+                        "inputs": [
+                            {
+                                "name": "_spender",
+                                "type": "address"
+                            },
+                            {
+                                "name": "_value",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "approve",
+                        "outputs": [
+                            {
+                                "name": "success",
+                                "type": "bool"
+                            }
+                        ],
+                        "payable": false,
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    }
+                ], tokenAddress);
+
+                // Check allowance
+                const allowance = await erc20Token.methods.allowance(userAddress, contractAddress).call();
+                if (allowance < mintAmount) {
+                    // Approve the contract to spend tokens
+                    await erc20Token.methods.approve(contractAddress, mintAmount).send({ from: userAddress });
+                }
+
+                // Mint tokens by calling the contract's mint function
+                const contract = new web3.eth.Contract([
+                    {
+                        "constant": false,
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "mint",
+                        "outputs": [],
+                        "payable": false,
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    }
+                ], contractAddress);
+
+                await contract.methods.mint(mintAmount).send({ from: userAddress });
+
+                // Display success message
+                document.getElementById('statusMessage').innerText = `Successfully minted ${mintAmount} tokens!`;
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('statusMessage').innerText = 'Minting Error';
+            }
+        });
+    </script>
+</body>
+</html>
