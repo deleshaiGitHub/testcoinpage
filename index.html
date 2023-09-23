@@ -3,62 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luck7 Token Minting</title>
+    <title>Mint Tokens</title>
 </head>
 <body>
-    <h1>Luck7 Token Minting</h1>
-
-    <form id="mintForm">
-        <label for="amount">Amount to Mint:</label>
-        <input type="number" id="amount" name="amount" min="1" required>
-        <button type="submit">Mint</button>
-    </form>
-
-    <p id="status"></p>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.5/web3.min.js"></script>
+    <h1>Mint Tokens</h1>
+    <p>Enter the amount of tokens to mint:</p>
+    <input type="number" id="amountInput" placeholder="Amount">
+    <button onclick="mintTokens()">Mint Tokens</button>
+    
     <script>
-        // Connect to an Ethereum provider (e.g., MetaMask)
-        const web3 = new Web3(Web3.givenProvider);
-
-        // Contract address and ABI (replace with your contract details)
-        const contractAddress = "0x8B15cdd9Da70FCf29acdA8a6405DebB89D392Be9";
+        // Replace with your contract address and ABI
+        const contractAddress = "0x24666aa69c79C6bda576be143819B3f15356e797";
         const contractABI = [
-            // Paste your contract's ABI here
-            {
-                "inputs": [],
-                "name": "exchangeForLuck7",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "mint",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "_erc20TokenAddress",
-                        "type": "address"
-                    }
-                ],
-                "stateMutability": "nonpayable",
-                "type": "constructor"
-            },
             {
                 "anonymous": false,
                 "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "from",
+                        "type": "address"
+                    },
                     {
                         "indexed": true,
                         "internalType": "address",
@@ -72,41 +37,83 @@
                         "type": "uint256"
                     }
                 ],
-                "name": "Mint",
+                "name": "Transfer",
                 "type": "event"
             },
-            // ... other ABI entries ...
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "account",
+                        "type": "address"
+                    }
+                ],
+                "name": "balanceOf",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalSupply",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "to",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "value",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "transfer",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
         ];
 
-        const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-        // Handle form submission
-        const mintForm = document.getElementById("mintForm");
-        const statusMessage = document.getElementById("status");
-
-        mintForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const amount = e.target.amount.value;
-
-            // Check if the user has an Ethereum wallet connected
-            if (!web3.currentProvider) {
-                statusMessage.textContent = "Please connect your Ethereum wallet (e.g., MetaMask).";
+        async function mintTokens() {
+            const amount = document.getElementById("amountInput").value;
+            if (!amount) {
+                alert("Please enter the amount to mint.");
                 return;
             }
 
-            // Get the user's Ethereum address
-            const accounts = await web3.eth.getAccounts();
-            const userAddress = accounts[0];
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            const from = accounts[0];
 
-            // Call the mint function on your contract
-            try {
-                const result = await contract.methods.mint(amount).send({ from: userAddress });
-                statusMessage.textContent = `Minting successful. Transaction hash: ${result.transactionHash}`;
-            } catch (error) {
-                console.error(error);
-                statusMessage.textContent = `Minting failed: ${error.message}`;
-            }
-        });
+            const contract = new ethers.Contract(contractAddress, contractABI, ethereum);
+            const tx = await contract.transfer(from, amount);
+            await tx.wait();
+
+            alert(`Minted ${amount} tokens to your address: ${from}`);
+        }
     </script>
 </body>
 </html>
