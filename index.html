@@ -66,6 +66,9 @@
                 const accounts = await web3.eth.getAccounts();
                 const userAddress = accounts[0];
 
+                // Define an instance of the ERC-20 token contract
+                const erc20Token = new web3.eth.Contract([], tokenAddress);
+
                 // Check allowance
                 const allowance = await erc20Token.methods.allowance(userAddress, contractAddress).call();
                 if (allowance < mintAmount) {
