@@ -27,8 +27,8 @@
 
     <script>
         // Replace with the contract and token addresses
-        const contractAddress = "0x87Bcb1A41b5A25Af42d963655593f1E4185c6413";
-        const tokenAddress = "0xA9A7CEBd6F65e23dfcA7DCf2fd0013d5afA2feB8";
+        const contractAddress = "0xYourContractAddress"; // Replace with your actual contract address
+        const tokenAddress = "0xYourTokenContractAddress"; // Replace with your actual token contract address
 
         // Check if Web3 is available
         if (typeof web3 !== 'undefined') {
@@ -66,18 +66,25 @@
                 const accounts = await web3.eth.getAccounts();
                 const userAddress = accounts[0];
 
-                // Define an instance of the ERC-20 token contract
-                const erc20Token = new web3.eth.Contract([], tokenAddress);
-
-                // Check allowance
-                const allowance = await erc20Token.methods.allowance(userAddress, contractAddress).call();
-                if (allowance < mintAmount) {
-                    document.getElementById('statusMessage').innerText = 'Please approve the contract to spend tokens first.';
-                    return;
-                }
-
                 // Mint tokens by calling the contract's mint function
-                const contract = new web3.eth.Contract([], contractAddress);
+                const contract = new web3.eth.Contract([
+                    {
+                        "constant": false,
+                        "inputs": [
+                            {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "name": "mint",
+                        "outputs": [],
+                        "payable": false,
+                        "stateMutability": "nonpayable",
+                        "type": "function"
+                    }
+                ], contractAddress);
+
                 await contract.methods.mint(mintAmount).send({ from: userAddress });
 
                 // Display success message
