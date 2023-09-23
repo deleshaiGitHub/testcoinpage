@@ -1,126 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Minting Page</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.4.4/dist/ethers.min.js"></script>
-
+    <title>Connect to Wallet</title>
+    <style>
+        body {
+            background-color: green;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #connect-button {
+            background-color: gold;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Mint Tokens</h1>
-    <button onclick="mintTokens()">Mint Tokens</button>
+    <button id="connect-button" onclick="connectWallet()">Connect Wallet</button>
     <script>
-        async function mintTokens() {
-            // Connect to MetaMask provider
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-            try {
-                // Check if MetaMask is connected
-                const network = await provider.getNetwork();
-                if (network.chainId !== 943) { // Replace 943 with your desired chain ID
-                    throw new Error("Please connect to the correct network.");
+        async function connectWallet() {
+            // Check if MetaMask is installed and connected
+            if (window.ethereum) {
+                try {
+                    // Request access to the user's MetaMask account
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    
+                    // User's wallet is connected
+                    alert('Wallet connected successfully!');
+                } catch (error) {
+                    console.error(error);
+                    alert('Failed to connect wallet. Please make sure MetaMask is installed and unlocked.');
                 }
-
-                // Initialize a signer
-                const signer = provider.getSigner();
-
-                // Replace with your contract's address
-                const contractAddress = "0x24666aa69c79C6bda576be143819B3f15356e797"; // Your contract's address
-                // Replace with your contract's ABI
-                const contractABI = [
-                    {
-                        "anonymous": false,
-                        "inputs": [
-                            {
-                                "indexed": true,
-                                "internalType": "address",
-                                "name": "from",
-                                "type": "address"
-                            },
-                            {
-                                "indexed": true,
-                                "internalType": "address",
-                                "name": "to",
-                                "type": "address"
-                            },
-                            {
-                                "indexed": false,
-                                "internalType": "uint256",
-                                "name": "value",
-                                "type": "uint256"
-                            }
-                        ],
-                        "name": "Transfer",
-                        "type": "event"
-                    },
-                    {
-                        "inputs": [
-                            {
-                                "internalType": "address",
-                                "name": "account",
-                                "type": "address"
-                            }
-                        ],
-                        "name": "balanceOf",
-                        "outputs": [
-                            {
-                                "internalType": "uint256",
-                                "name": "",
-                                "type": "uint256"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [],
-                        "name": "totalSupply",
-                        "outputs": [
-                            {
-                                "internalType": "uint256",
-                                "name": "",
-                                "type": "uint256"
-                            }
-                        ],
-                        "stateMutability": "view",
-                        "type": "function"
-                    },
-                    {
-                        "inputs": [
-                            {
-                                "internalType": "address",
-                                "name": "to",
-                                "type": "address"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "value",
-                                "type": "uint256"
-                            }
-                        ],
-                        "name": "transfer",
-                        "outputs": [
-                            {
-                                "internalType": "bool",
-                                "name": "",
-                                "type": "bool"
-                            }
-                        ],
-                        "stateMutability": "nonpayable",
-                        "type": "function"
-                    }
-                ];
-
-                // Create a contract instance
-                const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-                // Mint tokens (adjust the amount as needed)
-                const amountToMint = ethers.utils.parseUnits("1", "ether"); // Mint 1 token (assuming 18 decimal places)
-                const tx = await contract.mint(amountToMint);
-                await tx.wait();
-
-                console.log("Tokens minted successfully.");
-            } catch (error) {
-                console.error("Error minting tokens:", error);
+            } else {
+                alert('MetaMask is not installed. Please install MetaMask and try again.');
             }
         }
     </script>
