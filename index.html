@@ -6,7 +6,7 @@
     <title>Mint Tokens</title>
 </head>
 <body>
-    <h1>Mint some Tokens</h1>
+    <h1>Mint Tokens</h1>
 
     <!-- Connect Wallet Button -->
     <button id="connectWallet">Connect Wallet</button>
@@ -32,8 +32,8 @@
 
         // Check if Web3 is available
         if (typeof web3 !== 'undefined') {
-            web3 = new Web3(web3.currentProvider);
-        } else {
+           web3 = new Web3(window.ethereum);
+           } else {
             // Handle when Web3 is not available (e.g., user doesn't have a wallet)
             document.getElementById('connectWallet').innerText = 'No Web3 Provider Detected';
         }
