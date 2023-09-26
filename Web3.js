@@ -2,7 +2,7 @@
 const Web3 = require('web3'); // If you're using npm
 
 // Specify your Ethereum provider URL (e.g., Infura)
-const providerUrl = 'https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID';
+const providerUrl = 'https://rpc.v4.testnet.pulsechain.com';
 
 // Create a Web3 instance
 const web3 = new Web3(providerUrl);
