@@ -1,94 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Connect to Wallet</title>
-    <style>
-        body {
-            background-color: green;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        #connect-button, #mint-button {
-            background-color: gold;
-            color: black;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 20px;
-        }
-    </style>
+    <title>Token Claiming DApp</title>
 </head>
 <body>
-    <button id="connect-button" onclick="connectWallet()">Connect Wallet</button>
-    <button id="mint-button" onclick="mintTokens()">Mint Token</button>
-    <script>
-        async function connectWallet() {
-            // Check if MetaMask is installed and connected
-            if (window.ethereum) {
-                try {
-                    // Request access to the user's MetaMask account
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    
-                    // User's wallet is connected
-                    alert('Wallet connected successfully!');
-                } catch (error) {
-                    console.error(error);
-                    alert('Failed to connect wallet. Please make sure MetaMask is installed and unlocked.');
-                }
-            } else {
-                alert('MetaMask is not installed. Please install MetaMask and try again.');
-            }
-        }
-
-        async function mintTokens() {
-            // Check if MetaMask is connected
-            if (window.ethereum) {
-                try {
-                    // Create a contract instance for the token
-                    const contractAddress = "0x24666aa69c79C6bda576be143819B3f15356e797"; // Replace with your contract's address
-                    const contractABI = [
-                        {
-                            "inputs": [
-                                {
-                                    "internalType": "uint256",
-                                    "name": "amount",
-                                    "type": "uint256"
-                                }
-                            ],
-                            "name": "mint",
-                            "outputs": [],
-                            "stateMutability": "nonpayable",
-                            "type": "function"
-                        }
-                    ];
-
-                    // Initialize web3 provider
-                    const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-                    // Get signer
-                    const signer = provider.getSigner();
-
-                    // Create a contract instance
-                    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-                    // Mint 1 token (assuming 18 decimal places)
-                    const amountToMint = ethers.utils.parseUnits("1", "ether");
-                    const tx = await contract.mint(amountToMint);
-                    await tx.wait();
-
-                    alert('Token minted successfully!');
-                } catch (error) {
-                    console.error(error);
-                    alert('Failed to mint token. Please make sure you are connected to the correct network and have sufficient funds.');
-                }
-            } else {
-                alert('MetaMask is not installed or not connected. Please connect your wallet and try again.');
-            }
-        }
-    </script>
+    <h1>Token Claiming DApp</h1>
+    <label for="vestingContractAddress">Vesting Contract Address:</label>
+    <input type="text" id="vestingContractAddress" placeholder="Enter Vesting Contract Address">
+    <button onclick="checkVestedTokens()">Check Vested Tokens</button>
+    <div id="claimStatus"></div>
+    
+    <!-- Include Web3.js and your DApp's JavaScript file -->
+    <script src="web3.js"></script>
+    <script src="claiming_dapp.js"></script>
 </body>
 </html>
