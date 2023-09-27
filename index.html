@@ -370,7 +370,6 @@
         async function checkClaimableTokens(userAddress) {
             try {
                 // Connect to the vesting contract or token distribution contract
-                const provider = window.ethereum;
                 const contract = new window.web3.eth.Contract(contractABI, contractAddress);
 
                 // Call a function to check claimable tokens for the user
