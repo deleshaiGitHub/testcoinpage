@@ -15,10 +15,12 @@
     <script>
         // Function to connect the user's Ethereum wallet and check for claimable tokens
         async function connectWalletAndCheckClaimableTokens() {
-            // Request user permission to connect their Ethereum wallet
             if (typeof window.ethereum !== 'undefined') {
                 try {
+                    // Request user permission to connect their Ethereum wallet
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    
+                    // Use window.ethereum.selectedAddress to get the user's address
                     const userAddress = window.ethereum.selectedAddress;
                     console.log('Connected wallet address:', userAddress);
 
@@ -368,6 +370,7 @@
         async function checkClaimableTokens(userAddress) {
             try {
                 // Connect to the vesting contract or token distribution contract
+                const provider = window.ethereum;
                 const contract = new window.web3.eth.Contract(contractABI, contractAddress);
 
                 // Call a function to check claimable tokens for the user
