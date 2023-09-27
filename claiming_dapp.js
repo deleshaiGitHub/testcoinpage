@@ -5,7 +5,7 @@ async function connectWalletAndCheckClaimableTokens() {
     // Request user permission to connect their Ethereum wallet
     if (typeof window.ethereum !== 'undefined') {
         try {
-            const accounts = await window.ethereum.enable();
+            const accounts = await window.eth_requestAccounts();
             const userAddress = accounts[0];
             console.log('Connected wallet address:', userAddress);
 
