@@ -1,40 +1,9 @@
-// Initialize Web3.js and set up Ethereum provider (if not already done)
-// const Web3 = require('web3'); // If you're using npm
-
-// Specify your Ethereum provider URL (e.g., Infura)
-// const providerUrl = 'https://rpc.v4.testnet.pulsechain.com';
-
-// Create a Web3 instance
-const web3 = new Web3(providerUrl);
-
-// Check if Web3 is connected to a node
-web3.eth.net.isListening()
-    .then(() => console.log('Web3 is connected to a node'))
-    .catch(error => console.error('Web3 connection error:', error));
-
-// Request user permission to connect their Ethereum wallet (optional)
-if (typeof window.ethereum !== 'undefined') {
-    window.ethereum.enable()
-        .then(accounts => {
-            // User has approved access to their wallet
-            const userAddress = accounts[0];
-            console.log('Connected wallet address:', userAddress);
-
-            // After connecting the wallet, automatically check for claimable tokens
-            checkClaimableTokens(userAddress);
-        })
-        .catch(error => console.error('Wallet connection error:', error));
-}
-
-// Export the Web3 instance for use in other parts of your DApp (optional)
-module.exports = web3;
-
 // Function to connect the user's Ethereum wallet and check for claimable tokens
 async function connectWalletAndCheckClaimableTokens() {
     // Request user permission to connect their Ethereum wallet
     if (typeof window.ethereum !== 'undefined') {
         try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const accounts = await window.ethereum.enable();
             const userAddress = accounts[0];
             console.log('Connected wallet address:', userAddress);
 
@@ -50,7 +19,7 @@ async function connectWalletAndCheckClaimableTokens() {
 
 // Replace these with your contract's ABI and address
 const contractABI = [
-    {
+	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -385,7 +354,7 @@ const contractAddress = "0x6c376f0F763bFf42542c39794e28370A440cD6a2"; // Your co
 async function checkClaimableTokens(userAddress) {
     try {
         // Connect to the vesting contract or token distribution contract
-        const contract = new web3.eth.Contract(contractABI, contractAddress);
+        const contract = new window.web3.eth.Contract(contractABI, contractAddress);
 
         // Call a function to check claimable tokens for the user
         const claimableTokens = await contract.methods.getClaimableTokens(userAddress).call();
