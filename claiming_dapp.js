@@ -1,5 +1,5 @@
 // Initialize Web3.js and set up Ethereum provider (if not already done)
-const Web3 = require('web3'); // If you're using npm
+// const Web3 = require('web3'); // If you're using npm
 
 // Specify your Ethereum provider URL (e.g., Infura)
 const providerUrl = 'https://rpc.v4.testnet.pulsechain.com';
