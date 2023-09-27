@@ -1,6 +1,3 @@
-// Initialize Web3.js and connect to an Ethereum node
-// const Web3 = require('web3'); // If you're using npm
-
 // Specify your Ethereum provider URL (e.g., Infura)
 const providerUrl = 'https://rpc.v4.testnet.pulsechain.com';
 
@@ -24,4 +21,4 @@ if (typeof window.ethereum !== 'undefined') {
 }
 
 // Export the Web3 instance for use in other parts of your DApp (optional)
-module.exports = web3;
+window.web3 = web3;
