@@ -50,8 +50,7 @@ async function connectWalletAndCheckClaimableTokens() {
 
 // Replace these with your contract's ABI and address
 const contractABI = [
-    [
-	{
+    {
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -378,7 +377,6 @@ const contractABI = [
 		"stateMutability": "view",
 		"type": "function"
 	}
-]
 ];
 
 const contractAddress = "0x6c376f0F763bFf42542c39794e28370A440cD6a2"; // Your contract's address
