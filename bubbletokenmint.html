@@ -25,8 +25,7 @@
         const bubbleContractAddress = '0x319A9FB4254498d17837b369e6c3D06536175a56'; // Replace with your Bubble token contract's address
         const bubbleContractAbi = [
 	{
-		"inputs": [
-	{
+		{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -411,7 +410,7 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-] 
+]; 
 
         // Load the Bubble token contract instance
         const bubbleContract = new web3.eth.Contract(bubbleContractAbi, bubbleContractAddress);
