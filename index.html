@@ -3,39 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claiming Dapp</title>
-    <!-- Include Web3.js -->
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+    <title>Token Claim UI</title>
+    <!-- Include web3.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.6/web3.min.js"></script>
 </head>
 <body>
-    <h1>Claiming Dapp</h1>
-    <p id="claimStatus">Checking claimable tokens...</p>
-    <button onclick="claimTokens()">Claim Tokens</button>
+    <h1>Token Claim UI</h1>
+    <p>Contract Address: 0x6c376f0F763bFf42542c39794e28370A440cD6a2</p>
+
+    <!-- Add a button to initiate the token claim -->
+    <button id="claimTokensButton">Claim Tokens</button>
 
     <script>
-        // Function to connect the user's Ethereum wallet and check for claimable tokens
-        async function connectWalletAndCheckClaimableTokens() {
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    // Request user permission to connect their Ethereum wallet
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    
-                    // Use window.ethereum.selectedAddress to get the user's address
-                    const userAddress = window.ethereum.selectedAddress;
-                    console.log('Connected wallet address:', userAddress);
+        // Check if MetaMask is installed
+        if (typeof window.ethereum !== 'undefined') {
+            const web3 = new Web3(window.ethereum);
 
-                    // After connecting the wallet, automatically check for claimable tokens
-                    await checkClaimableTokens(userAddress);
-                } catch (error) {
-                    console.error('Wallet connection error:', error);
-                }
-            } else {
-                console.error('Ethereum wallet provider not found.');
-            }
-        }
-
-        // Replace these with your contract's ABI and address
-        const contractABI = [
+            // Contract ABI
+            const contractABI = [
 	{
 		"inputs": [
 			{
@@ -364,33 +349,36 @@
 		"type": "function"
 	}
 ];
-        const contractAddress = "0x6c376f0F763bFf42542c39794e28370A440cD6a2"; // Your contract's address
 
-        // Function to check claimable tokens for a user
-        async function checkClaimableTokens(userAddress) {
-            try {
-                // Connect to the vesting contract or token distribution contract
-                const contract = new window.web3.eth.Contract(contractABI, contractAddress);
+            // Contract Address
+            const contractAddress = '0x6c376f0F763bFf42542c39794e28370A440cD6a2';
 
-                // Call a function to check claimable tokens for the user
-                const claimableTokens = await contract.methods.getClaimableTokens(userAddress).call();
+            // Create a contract instance
+            const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-                // Display the claimable tokens on the page
-                document.getElementById("claimStatus").textContent = `You can claim ${claimableTokens} tokens.`;
-            } catch (error) {
-                console.error('Error checking claimable tokens:', error);
-            }
+            // Add an event listener to the button
+            document.getElementById('claimTokensButton').addEventListener('click', async () => {
+                try {
+                    // Request access to MetaMask
+                    await window.ethereum.enable();
+
+                    // Get the current Ethereum account
+                    const accounts = await web3.eth.getAccounts();
+                    const sender = accounts[0];
+
+                    // Call the claimTokens function
+                    await contract.methods.claimTokens().send({ from: sender });
+
+                    // Show a success message to the user
+                    alert('Tokens claimed successfully!');
+                } catch (error) {
+                    console.error(error);
+                    alert('An error occurred while claiming tokens.');
+                }
+            });
+        } else {
+            alert('MetaMask is not installed. Please install MetaMask to claim tokens.');
         }
-
-        // Function to initiate the claiming process (if desired)
-        async function claimTokens() {
-            // Implement the claiming logic here
-        }
-
-        // Call the connectWalletAndCheckClaimableTokens function when the page loads
-        window.addEventListener('load', () => {
-            connectWalletAndCheckClaimableTokens();
-        });
     </script>
 </body>
 </html>
