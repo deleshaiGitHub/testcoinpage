@@ -1,27 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>MintMe Token Minting</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
-</head>
-<body>
-    <h1>MintMe Token Minting</h1>
-    <p>Enter the number of tokens you want to mint:</p>
-    <input type="number" id="mintAmount" placeholder="Amount">
-    <button id="mintTokens">Mint Tokens</button>
-    <div id="status"></div>
+<!-- ... (HTML content before the script) -->
 
-    <script>
-        // Initialize Web3
-        if (typeof web3 !== 'undefined') {
-            web3 = new Web3(web3.currentProvider);
-        } else {
-            alert("Web3 provider not found. Please install MetaMask or another Ethereum wallet.");
-        }
+<script>
+    // Initialize Web3
+    if (typeof web3 !== 'undefined') {
+        web3 = new Web3(web3.currentProvider);
+    } else {
+        alert("Web3 provider not found. Please install MetaMask or another Ethereum wallet.");
+    }
 
-        // Set the contract address and ABI
-        const contractAddress = '0x24F1A998d62A110F71AC9f59861003170b563517'; // Replace with your contract's address
-        const contractAbi = [
+    // Set the contract address and ABI
+    const contractAddress = '0x24F1A998d62A110F71AC9f59861003170b563517'; // Replace with your contract's address
+    const contractAbi = [
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -275,29 +264,32 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-
 ]; // Replace with your contract's ABI
 
-        // Load the contract instance
-        const contract = new web3.eth.Contract(contractAbi, contractAddress);
+    // Load the contract instance
+    const contract = new web3.eth.Contract(contractAbi, contractAddress);
 
-        // Event listener for the "Mint Tokens" button
-        document.getElementById('mintTokens').addEventListener('click', () => {
-            const mintAmount = document.getElementById('mintAmount').value;
-            const statusElement = document.getElementById('status');
+    // Event listener for the "Mint Tokens" button
+    document.getElementById('mintTokens').addEventListener('click', async () => {
+        const mintAmount = document.getElementById('mintAmount').value;
+        const statusElement = document.getElementById('status');
 
-            // Call the mint function on the contract
-            contract.methods.mint(mintAmount).send({ from: web3.eth.defaultAccount })
-                .on('transactionHash', (hash) => {
-                    statusElement.innerHTML = `Transaction Hash: ${hash}`;
-                })
-                .on('receipt', (receipt) => {
-                    statusElement.innerHTML = `Tokens minted successfully!`;
-                })
-                .on('error', (error) => {
-                    statusElement.innerHTML = `Error: ${error.message}`;
-                });
-        });
-    </script>
-</body>
-</html>
+        // Get the selected Ethereum account (sender address)
+        const accounts = await web3.eth.getAccounts();
+        const fromAddress = accounts[0]; // You can choose the first account by default
+
+        // Call the mint function on the contract with the sender address specified
+        contract.methods.mint(mintAmount).send({ from: fromAddress })
+            .on('transactionHash', (hash) => {
+                statusElement.innerHTML = `Transaction Hash: ${hash}`;
+            })
+            .on('receipt', (receipt) => {
+                statusElement.innerHTML = `Tokens minted successfully!`;
+            })
+            .on('error', (error) => {
+                statusElement.innerHTML = `Error: ${error.message}`;
+            });
+    });
+</script>
+
+<!-- ... (HTML content after the script) -->
