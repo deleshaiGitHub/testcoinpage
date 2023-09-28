@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token Faucet</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>Token Faucet</h1>
+    <p>Request tokens from the faucet:</p>
+    <button id="requestTokens">Request Tokens</button>
+    <div id="status"></div>
+
+    <script>
+        // Initialize Web3
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            alert("Web3 provider not found. Please install MetaMask or another Ethereum wallet.");
+        }
+
+        // Set the contract addresses
+        const faucetContractAddress = 'YOUR_FAUCET_CONTRACT_ADDRESS';
+        const tokenContractAddress = 'YOUR_TOKEN_CONTRACT_ADDRESS';
+
+        // Load the faucet and token contract instances
+        const faucetContract = new web3.eth.Contract(faucetContractAbi, faucetContractAddress);
+        const tokenContract = new web3.eth.Contract(tokenContractAbi, tokenContractAddress);
+
+        // Event listener for the "Request Tokens" button
+        document.getElementById('requestTokens').addEventListener('click', () => {
+            faucetContract.methods.requestTokens().send({ from: web3.eth.defaultAccount })
+                .on('transactionHash', (hash) => {
+                    document.getElementById('status').innerHTML = `Transaction Hash: ${hash}`;
+                })
+                .on('receipt', (receipt) => {
+                    document.getElementById('status').innerHTML = `Tokens received successfully!`;
+                })
+                .on('error', (error) => {
+                    document.getElementById('status').innerHTML = `Error: ${error.message}`;
+                });
+        });
+    </script>
+</body>
+</html>
