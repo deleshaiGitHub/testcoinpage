@@ -276,27 +276,31 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-]; // Replace with your contract's ABI
+];
 
         // Load the contract instance
         const contract = new web3.eth.Contract(contractAbi, contractAddress);
 
         // Event listener for the "Mint Tokens" button
-        document.getElementById('mintTokens').addEventListener('click', () => {
+        document.getElementById('mintTokens').addEventListener('click', async () => {
             const mintAmount = document.getElementById('mintAmount').value;
             const statusElement = document.getElementById('status');
 
-            // Call the mint function on the contract
-            contract.methods.mint(mintAmount).send({ from: web3.eth.defaultAccount })
-                .on('transactionHash', (hash) => {
-                    statusElement.innerHTML = `Transaction Hash: ${hash}`;
-                })
-                .on('receipt', (receipt) => {
-                    statusElement.innerHTML = `Tokens minted successfully!`;
-                })
-                .on('error', (error) => {
-                    statusElement.innerHTML = `Error: ${error.message}`;
-                });
+            try {
+                // Check if MetaMask is connected
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                const fromAddress = accounts[0];
+                if (!fromAddress) {
+                    alert("Please connect your MetaMask wallet.");
+                    return;
+                }
+
+                // Call the mint function on the contract
+                await contract.methods.mint(parseInt(mintAmount)).send({ from: fromAddress });
+                statusElement.innerHTML = `Tokens minted successfully!`;
+            } catch (error) {
+                statusElement.innerHTML = `Error: ${error.message}`;
+            }
         });
     </script>
 </body>
