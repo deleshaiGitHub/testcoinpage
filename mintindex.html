@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MintMe Token Minting</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>MintMe Token Minting</h1>
+    <p>Enter the number of tokens you want to mint:</p>
+    <input type="number" id="mintAmount" placeholder="Amount">
+    <button id="mintTokens">Mint Tokens</button>
+    <div id="status"></div>
+
+    <script>
+        // Initialize Web3
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            alert("Web3 provider not found. Please install MetaMask or another Ethereum wallet.");
+        }
+
+        // Set the contract address and ABI
+        const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your contract's address
+        const contractAbi = [ /* ... */ ]; // Replace with your contract's ABI
+
+        // Load the contract instance
+        const contract = new web3.eth.Contract(contractAbi, contractAddress);
+
+        // Event listener for the "Mint Tokens" button
+        document.getElementById('mintTokens').addEventListener('click', () => {
+            const mintAmount = document.getElementById('mintAmount').value;
+            const statusElement = document.getElementById('status');
+
+            // Call the mint function on the contract
+            contract.methods.mint(mintAmount).send({ from: web3.eth.defaultAccount })
+                .on('transactionHash', (hash) => {
+                    statusElement.innerHTML = `Transaction Hash: ${hash}`;
+                })
+                .on('receipt', (receipt) => {
+                    statusElement.innerHTML = `Tokens minted successfully!`;
+                })
+                .on('error', (error) => {
+                    statusElement.innerHTML = `Error: ${error.message}`;
+                });
+        });
+    </script>
+</body>
+</html>
