@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Claim Status</title>
+    <!-- Include web3.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.6/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>Token Claim Status</h1>
+    <p>Contract Address: 0x6c376f0F763bFf42542c39794e28370A440cD6a2</p>
+
+    <div>
+        <p>Total Tokens Available to Claim: <span id="totalTokens"></span></p>
+    </div>
+
+    <script>
+        // Check if MetaMask is installed
+        if (typeof window.ethereum !== 'undefined') {
+            const web3 = new Web3(window.ethereum);
+
+            // Contract ABI
+            const contractABI = [
+                // ... (Your contract ABI here)
+            ];
+
+            // Contract Address
+            const contractAddress = '0x6c376f0F763bFf42542c39794e28370A440cD6a2';
+
+            // Create a contract instance
+            const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+            // Function to get the total tokens available to claim
+            async function getTotalTokensAvailable() {
+                try {
+                    const totalSupply = await contract.methods.totalSupply().call();
+                    const claimedTokens = await contract.methods.balanceOf(contractAddress).call();
+                    const tokensAvailable = totalSupply - claimedTokens;
+                    return tokensAvailable;
+                } catch (error) {
+                    console.error(error);
+                    return 0;
+                }
+            }
+
+            // Update the UI with the total tokens available
+            async function updateTotalTokensAvailable() {
+                const tokensAvailable = await getTotalTokensAvailable();
+                document.getElementById('totalTokens').textContent = tokensAvailable;
+            }
+
+            // Call the update function when the page loads
+            window.addEventListener('load', updateTotalTokensAvailable);
+        } else {
+            alert('MetaMask is not installed. Please install MetaMask to view token status.');
+        }
+    </script>
+</body>
+</html>
