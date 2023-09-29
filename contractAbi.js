@@ -1,45 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claiming Dapp</title>
-    <!-- Include Web3.js -->
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
-</head>
-<body>
-    <h1>Claiming Dapp</h1>
-    <p id="claimStatus">Checking claimable tokens...</p>
-    <button onclick="claimTokens()">Claim Tokens</button>
-
-    <script>
-        // Function to connect the user's Ethereum wallet and check for claimable tokens
-        async function connectWalletAndCheckClaimableTokens() {
-            // Request user permission to connect their Ethereum wallet
-            if (typeof window.ethereum !== 'undefined') {
-                try {
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const userAddress = window.ethereum.selectedAddress;
-                    console.log('Connected wallet address:', userAddress);
-
-                    // After connecting the wallet, automatically check for claimable tokens
-                    await checkClaimableTokens(userAddress);
-                } catch (error) {
-                    console.error('Wallet connection error:', error);
-                }
-            } else {
-                console.error('Ethereum wallet provider not found.');
-            }
-        }
-
-        // Replace these with your contract's ABI and address
-        const contractABI = [
+[
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "initialSupply",
-				"type": "uint256"
+				"internalType": "address",
+				"name": "_tradeToken",
+				"type": "address"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -95,13 +60,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "claimTokens",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -146,6 +104,45 @@
 				"type": "bool"
 			}
 		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "mintWithTradeToken",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
@@ -231,6 +228,19 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "owner",
 				"type": "address"
 			},
@@ -272,32 +282,6 @@
 	},
 	{
 		"inputs": [],
-		"name": "claimInterval",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "claimPercentage",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "decimals",
 		"outputs": [
 			{
@@ -324,12 +308,12 @@
 	},
 	{
 		"inputs": [],
-		"name": "startTime",
+		"name": "owner",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "address",
 				"name": "",
-				"type": "uint256"
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -350,6 +334,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "TOTAL_SUPPLY",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "totalSupply",
 		"outputs": [
 			{
@@ -360,35 +357,31 @@
 		],
 		"stateMutability": "view",
 		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "tradeRatio",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "tradeToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
 	}
-];
-        const contractAddress = "0x6c376f0F763bFf42542c39794e28370A440cD6a2"; // Your contract's address
-
-        // Function to check claimable tokens for a user
-        async function checkClaimableTokens(userAddress) {
-            try {
-                // Connect to the vesting contract or token distribution contract
-                const contract = new window.web3.eth.Contract(contractABI, contractAddress);
-
-                // Call a function to check claimable tokens for the user
-                const claimableTokens = await contract.methods.getClaimableTokens(userAddress).call();
-
-                // Display the claimable tokens on the page
-                document.getElementById("claimStatus").textContent = `You can claim ${claimableTokens} tokens.`;
-            } catch (error) {
-                console.error('Error checking claimable tokens:', error);
-            }
-        }
-
-        // Function to initiate the claiming process (if desired)
-        async function claimTokens() {
-            // Implement the claiming logic here
-        }
-
-        // Call the connectWalletAndCheckClaimableTokens function when the page loads
-        window.addEventListener('load', () => {
-            connectWalletAndCheckClaimableTokens();
-        });
-    </script>
-</body>
-</html>
+]
