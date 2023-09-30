@@ -1,53 +1,345 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MintMe Token Minting</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
-    <script src="abi.js"></script> <!-- Make sure this points to your actual ABI file -->
+    <title>Mint Tokens</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.6.0/web3.min.js"></script>
 </head>
 <body>
-    <h1>MintMe Token Minting</h1>
-    <p>Enter the number of tokens you want to mint:</p>
-    <input type="number" id="mintAmount" placeholder="Amount">
+    <h1>Mint Tokens</h1>
+    <p>Connect your wallet and mint tokens:</p>
+    <button id="connectWallet">Connect Wallet</button>
     <button id="mintTokens">Mint Tokens</button>
-    <div id="status"></div>
-
+    
     <script>
-        // Initialize Web3
-        let web3;
-        if (typeof window.ethereum !== 'undefined') {
-            web3 = new Web3(window.ethereum);
-        } else {
-            alert("Web3 provider not found. Please install MetaMask or another Ethereum wallet.");
-        }
-
-        // Set the contract address
-        const contractAddress = '0x24F1A998d62A110F71AC9f59861003170b563517'; // Replace with your contract's address
-
-        // Load the contract instance
-        const contract = new web3.eth.Contract(contractAbi, contractAddress);
-
-        // Event listener for the "Mint Tokens" button
-        document.getElementById('mintTokens').addEventListener('click', async () => {
-            const mintAmount = document.getElementById('mintAmount').value;
-            const statusElement = document.getElementById('status');
-
-            try {
-                // Check if MetaMask is connected
-                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                const fromAddress = accounts[0];
-                if (!fromAddress) {
-                    alert("Please connect your MetaMask wallet.");
-                    return;
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                // Initialize web3.js
+                window.web3 = new Web3(window.ethereum);
+                try {
+                    // Request account access if needed
+                    await window.ethereum.enable();
+                } catch (error) {
+                    console.error(error);
                 }
+            }
 
-                // Call the mint function on the contract
-                await contract.methods.mint(parseInt(mintAmount)).send({ from: fromAddress });
-                statusElement.textContent = `Tokens minted successfully!`;
-            } catch (error) {
-                statusElement.textContent = `Error: ${error.message}`;
+            // Set the contract address and ABI
+            const contractAddress = '0xeB4C61EC3C6359702Fc25c13055f5fD92E50acD6';
+            const contractABI = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "Approval",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "approve",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "mint",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "transfer",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "Transfer",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "value",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "allowance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "balanceOf",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "decimals",
+		"outputs": [
+			{
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "inputToken",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "maxSupply",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "mintingRatio",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "name",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "symbol",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalSupply",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+            const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+            // Add event listeners
+            document.getElementById('connectWallet').addEventListener('click', connectWallet);
+            document.getElementById('mintTokens').addEventListener('click', mintTokens);
+
+            async function connectWallet() {
+                if (typeof window.ethereum !== 'undefined') {
+                    try {
+                        await window.ethereum.enable();
+                        const accounts = await web3.eth.getAccounts();
+                        if (accounts.length > 0) {
+                            console.log('Connected:', accounts[0]);
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            }
+
+            async function mintTokens() {
+                const amountToMint = 1; // Replace with the amount you want to mint
+                try {
+                    const accounts = await web3.eth.getAccounts();
+                    if (accounts.length > 0) {
+                        const sender = accounts[0];
+                        const gas = await contract.methods.mint(amountToMint).estimateGas();
+                        const result = await contract.methods.mint(amountToMint).send({ from: sender, gas });
+                        console.log('Tokens minted:', result);
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
             }
         });
     </script>
