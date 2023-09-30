@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MintMe Token Minting</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <title>Mint Tokens</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.6/web3.min.js"></script>
 </head>
 <body>
-    <h1>MintMe Token Minting</h1>
-    <p>Enter the number of PLSX tokens you want to use:</p>
-    <input type="number" id="plsxAmount" placeholder="PLSX Amount">
-    <p>Enter the number of MintMe tokens to mint:</p>
-    <input type="number" id="mintAmount" placeholder="MintMe Amount">
+    <h1>Mint Tokens</h1>
+    <p>Connect your wallet and mint tokens:</p>
+    <button id="connectWallet">Connect Wallet</button>
     <button id="mintTokens">Mint Tokens</button>
-    <div id="status"></div>
-
+    
     <script>
-        // Initialize Web3
-        let web3;
-        if (typeof window.ethereum !== 'undefined') {
-            web3 = new Web3(window.ethereum);
-        } else {
-            alert("Web3 provider not found. Please install MetaMask or another Ethereum wallet.");
-        }
+        window.addEventListener('load', async () => {
+            if (window.ethereum) {
+                // Initialize web3.js
+                window.web3 = new Web3(window.ethereum);
+                try {
+                    // Request account access if needed
+                    await window.ethereum.enable();
+                } catch (error) {
+                    console.error(error);
+                }
+            }
 
-        // Set the contract addresses and ABIs
-        const plsxContractAddress = '0x8a810ea8B121d08342E9e7696f4a9915cBE494B7'; // Replace with PLSX contract address
-        // const plsxContractAbi = []; // Replace with PLSX contract ABI
-        const mintMeContractAddress = '0xeB4C61EC3C6359702Fc25c13055f5fD92E50acD6'; // Replace with MintMe contract address
-        const mintMeContractAbi = [
+            // Set the contract address and ABI for the MintMe token
+            const contractAddress = '0xeB4C61EC3C6359702Fc25c13055f5fD92E50acD6';
+            const contractABI = [
 	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
@@ -306,35 +305,43 @@
 		"stateMutability": "view",
 		"type": "function"
 	}
-]; // Replace with MintMe contract ABI
+];
 
-        // Load the contract instances
-        const plsxContract = new web3.eth.Contract(plsxContractAddress);
-        const mintMeContract = new web3.eth.Contract(mintMeContractAbi, mintMeContractAddress);
+            const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-        // Event listener for the "Mint Tokens" button
-        document.getElementById('mintTokens').addEventListener('click', async () => {
-            const plsxAmount = document.getElementById('plsxAmount').value;
-            const mintAmount = document.getElementById('mintAmount').value;
-            const statusElement = document.getElementById('status');
+            // Add event listeners
+            document.getElementById('connectWallet').addEventListener('click', connectWallet);
+            document.getElementById('mintTokens').addEventListener('click', mintTokens);
 
-            try {
-                // Check if MetaMask is connected
-                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                const fromAddress = accounts[0];
-                if (!fromAddress) {
-                    alert("Please connect your MetaMask wallet.");
-                    return;
+            async function connectWallet() {
+                if (typeof window.ethereum !== 'undefined') {
+                    try {
+                        await window.ethereum.enable();
+                        const accounts = await web3.eth.getAccounts();
+                        if (accounts.length > 0) {
+                            console.log('Connected:', accounts[0]);
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
                 }
+            }
 
-                // Call the transferFrom function on PLSX contract to transfer PLSX tokens from user
-                await plsxContract.methods.transferFrom(fromAddress, mintMeContractAddress, plsxAmount).send({ from: fromAddress });
+            async function mintTokens() {
+                const plsxAmount = 1; // 1 PLSX token for minting 1 MintMe token
+                try {
+                    const accounts = await web3.eth.getAccounts();
+                    if (accounts.length > 0) {
+                        const sender = accounts[0];
 
-                // Call the mint function on MintMe contract to mint tokens
-                await mintMeContract.methods.mint(parseInt(mintAmount)).send({ from: fromAddress });
-                statusElement.innerHTML = `Tokens minted successfully!`;
-            } catch (error) {
-                statusElement.innerHTML = `Error: ${error.message}`;
+                        // Perform the token swap by calling the 'mint' function on the MintMe contract
+                        const gas = await contract.methods.mint(plsxAmount).estimateGas();
+                        const result = await contract.methods.mint(plsxAmount).send({ from: sender, gas });
+                        console.log('Tokens minted:', result);
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
             }
         });
     </script>
