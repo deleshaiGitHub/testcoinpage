@@ -1,50 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Token Exchange Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luck Token Faucet</title>
 </head>
 <body>
-    <h1>Token Exchange</h1>
-    <p>Enter your wallet address to receive tokens:</p>
-    <input type="text" id="walletAddress" placeholder="Your Wallet Address">
-    <button id="requestTokens">Request Tokens</button>
-    <div id="status"></div>
+    <h1>Luck Token Faucet</h1>
+    
+    <p>Your Luck Token (LUCK) balance: <span id="luckBalance"></span></p>
+    <p>Your Fee Token (PLSX) balance: <span id="feeBalance"></span></p>
+    
+    <button onclick="requestTokens()">Request 1000 Luck Tokens</button>
+    
+    <div id="transactionStatus"></div>
 
-    <h2>Exchange Tokens for Something:</h2>
-    <p>Provide your email to receive a gift:</p>
-    <input type="text" id="email" placeholder="Your Email">
-    <button id="exchangeTokens">Exchange Tokens</button>
-    <div id="exchangeStatus"></div>
-
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
     <script>
-        // Simulated token balance
-        let tokenBalance = 1000;
+        // Replace with your deployed contract address and ABI
+        const contractAddress = '0x4438803b7dAeCD02D170522E8710c9779296f532';
+        const contractABI = [
+	{
+		"inputs": [],
+		"name": "requestTokens",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "feeTokenAddress",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "luckToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]; // Your contract ABI
+        
+        // Initialize web3.js
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            alert("Please install MetaMask to use this dApp.");
+        }
+        
+        // Connect to the contract
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-        // Event listener for the "Request Tokens" button
-        document.getElementById('requestTokens').addEventListener('click', () => {
-            // ... (Same code as previous example)
+        // Get the user's Ethereum address
+        web3.eth.getAccounts().then(function (accounts) {
+            const userAddress = accounts[0];
+            
+            // Fetch and display Luck Token (LUCK) balance
+            contract.methods.luckTokenBalance(userAddress).call().then(function (balance) {
+                document.getElementById("luckBalance").innerText = balance;
+            });
+
+            // Fetch and display Fee Token (PLSX) balance
+            contract.methods.feeTokenBalance(userAddress).call().then(function (balance) {
+                document.getElementById("feeBalance").innerText = balance;
+            });
         });
 
-        // Event listener for the "Exchange Tokens" button
-        document.getElementById('exchangeTokens').addEventListener('click', () => {
-            const email = document.getElementById('email').value;
-            const exchangeStatusElement = document.getElementById('exchangeStatus');
+        // Function to request tokens
+        function requestTokens() {
+            contract.methods.requestTokens().send({ from: web3.currentProvider.selectedAddress })
+            .on('transactionHash', function (hash) {
+                document.getElementById("transactionStatus").innerHTML = "Transaction pending...";
+            })
+            .on('receipt', function (receipt) {
+                document.getElementById("transactionStatus").innerHTML = "Transaction confirmed. 1000 Luck Tokens received!";
+                // Update the displayed balances
+                updateBalances();
+            })
+            .on('error', function (error) {
+                document.getElementById("transactionStatus").innerHTML = "Transaction failed: " + error.message;
+            });
+        }
 
-            // Check if a valid email is provided (simplified check)
-            if (!email || !email.includes('@')) {
-                exchangeStatusElement.innerHTML = 'Please provide a valid email address.';
-                return;
-            }
+        // Function to update token balances
+        function updateBalances() {
+            contract.methods.luckTokenBalance(web3.currentProvider.selectedAddress).call().then(function (balance) {
+                document.getElementById("luckBalance").innerText = balance;
+            });
 
-            // Simulate the exchange
-            if (tokenBalance >= 10) {
-                tokenBalance -= 10; // Deduct 10 tokens from the balance
-                // Provide a gift or perform an action (simplified)
-                exchangeStatusElement.innerHTML = 'Tokens exchanged successfully. Check your email for the gift.';
-            } else {
-                exchangeStatusElement.innerHTML = 'Insufficient token balance.';
-            }
-        });
+            contract.methods.feeTokenBalance(web3.currentProvider.selectedAddress).call().then(function (balance) {
+                document.getElementById("feeBalance").innerText = balance;
+            });
+        }
     </script>
 </body>
 </html>
