@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pulsechain Price Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+
+    #app {
+      text-align: center;
+    }
+
+    #price-container {
+      margin-top: 20px;
+    }
+
+    #price {
+      font-size: 24px;
+    }
+
+    #progress-bar {
+      height: 20px;
+      width: 0;
+      background-color: #4caf50; /* Green color */
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Pulsechain Price Tracker</h1>
+    <div id="price-container">
+      <p id="price">Fetching price...</p>
+      <div id="progress-bar"></div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const priceElement = document.getElementById('price');
+      const progressBar = document.getElementById('progress-bar');
+
+      const fetchTokenPrice = async () => {
+        try {
+          const response = await fetch('https://dexscreener.com/pulsechain/0xe56043671df55de5cdf8459710433c10324de0ae');
+          const htmlContent = await response.text();
+
+          // Use DOM manipulation to extract the relevant data from the HTML
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlContent, 'text/html');
+
+          // Extract the price using DOM manipulation
+          const priceSpan = doc.querySelector('.price');
+          const price = priceSpan ? priceSpan.textContent.trim() : null;
+
+          if (price !== null) {
+            priceElement.textContent = `Current Price: $${price}`;
+            
+            // Update progress bar (Assuming a maximum price of $100 for simplicity)
+            const maxPrice = 100;
+            const percentage = (parseFloat(price) / maxPrice) * 100;
+            progressBar.style.width = `${percentage}%`;
+          } else {
+            throw new Error('Data extraction failed');
+          }
+        } catch (error) {
+          console.error('Error fetching token price:', error);
+          priceElement.textContent = `Error fetching price: ${error.message}`;
+        } finally {
+          // Set a delay (e.g., 10 seconds) before the next request
+          setTimeout(fetchTokenPrice, 10000);
+        }
+      };
+
+      fetchTokenPrice();
+    });
+  </script>
+</body>
+</html>
