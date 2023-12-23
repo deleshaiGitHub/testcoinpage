@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pulsechain Price Tracker</title>
+  <title>Crypto Price Tracker</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -20,20 +20,33 @@
       text-align: center;
     }
 
-    #price-container {
+    .crypto-container {
       margin-top: 20px;
+      margin-bottom: 30px;
     }
 
-    #price {
-      font-size: 24px;
+    .crypto-box {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 10px;
     }
 
-    #percentage {
+    .crypto-title {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .crypto-price {
+      font-size: 18px;
+    }
+
+    .crypto-percentage {
       margin-top: 10px;
       font-size: 16px;
     }
 
-    #progress-bar {
+    .progress-bar {
       height: 20px;
       width: 0;
       background-color: #4caf50; /* Green color */
@@ -43,46 +56,79 @@
 </head>
 <body>
   <div id="app">
-    <h1>Pulsechain Price Tracker</h1>
-    <div id="price-container">
-      <p id="price">Fetching price...</p>
-      <div id="progress-bar"></div>
-      <p id="percentage">Percentage Increase: Calculating...</p>
+    <h1>Crypto Price Tracker</h1>
+    
+    <div class="crypto-container">
+      <div class="crypto-box" id="pulsechain-box">
+        <p class="crypto-title">Pulsechain (PLS)</p>
+        <p class="crypto-price" id="pulsechain-price">Fetching price...</p>
+        <div class="progress-bar" id="pulsechain-progress-bar"></div>
+        <p class="crypto-percentage" id="pulsechain-percentage">Percentage Increase: Calculating...</p>
+      </div>
+
+      <div class="crypto-box" id="solana-box">
+        <p class="crypto-title">Solana (SOL)</p>
+        <p class="crypto-price" id="solana-price">Fetching price...</p>
+        <div class="progress-bar" id="solana-progress-bar"></div>
+        <p class="crypto-percentage" id="solana-percentage">Percentage Increase: Calculating...</p>
+      </div>
     </div>
   </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const priceElement = document.getElementById('price');
-      const progressBar = document.getElementById('progress-bar');
-      const percentageElement = document.getElementById('percentage');
+      const pulsechainPriceElement = document.getElementById('pulsechain-price');
+      const pulsechainProgressBar = document.getElementById('pulsechain-progress-bar');
+      const pulsechainPercentageElement = document.getElementById('pulsechain-percentage');
 
-      // Set the reference low price
-      const referenceLowPrice = 0.00003298;
+      const solanaPriceElement = document.getElementById('solana-price');
+      const solanaProgressBar = document.getElementById('solana-progress-bar');
+      const solanaPercentageElement = document.getElementById('solana-percentage');
 
-      const fetchTokenPrice = async () => {
+      // Set the reference low prices
+      const pulsechainReferenceLow = 0.00003298;
+      const solanaReferenceLow = 9.65;
+
+      const fetchTokenPrices = async () => {
         try {
-          const response = await fetch('https://api.coinpaprika.com/v1/tickers/pls-pulsechain');
-          const data = await response.json();
+          // Fetch Pulsechain data
+          const pulsechainResponse = await fetch('https://api.coinpaprika.com/v1/tickers/pls-pulsechain');
+          const pulsechainData = await pulsechainResponse.json();
 
-          const currentPrice = data.quotes.USD.price;
-          const percentageIncrease = ((currentPrice - referenceLowPrice) / referenceLowPrice) * 100;
+          const pulsechainCurrentPrice = pulsechainData.quotes.USD.price;
+          const pulsechainPercentageIncrease = ((pulsechainCurrentPrice - pulsechainReferenceLow) / pulsechainReferenceLow) * 100;
 
-          priceElement.textContent = `Current Price: $${currentPrice.toFixed(8)}`;
-          percentageElement.textContent = `Percentage Increase: ${percentageIncrease.toFixed(2)}%`;
+          pulsechainPriceElement.textContent = `Current Price: $${pulsechainCurrentPrice.toFixed(8)}`;
+          pulsechainPercentageElement.textContent = `Percentage Increase: ${pulsechainPercentageIncrease.toFixed(2)}%`;
 
-          // Update progress bar (Assuming a maximum percentage increase of 100% for simplicity)
-          progressBar.style.width = `${Math.min(percentageIncrease, 100)}%`;
+          // Update Pulsechain progress bar (Assuming a maximum percentage increase of 100% for simplicity)
+          pulsechainProgressBar.style.width = `${Math.min(pulsechainPercentageIncrease, 100)}%`;
+
+          // Fetch Solana data
+          const solanaResponse = await fetch('https://api.coinpaprika.com/v1/tickers/sol-solana');
+          const solanaData = await solanaResponse.json();
+
+          const solanaCurrentPrice = solanaData.quotes.USD.price;
+          const solanaPercentageIncrease = ((solanaCurrentPrice - solanaReferenceLow) / solanaReferenceLow) * 100;
+
+          solanaPriceElement.textContent = `Current Price: $${solanaCurrentPrice.toFixed(2)}`;
+          solanaPercentageElement.textContent = `Percentage Increase: ${solanaPercentageIncrease.toFixed(2)}%`;
+
+          // Update Solana progress bar (Assuming a maximum percentage increase of 100% for simplicity)
+          solanaProgressBar.style.width = `${Math.min(solanaPercentageIncrease, 100)}%`;
         } catch (error) {
-          console.error('Error fetching token price:', error);
-          priceElement.textContent = `Error fetching price: ${error.message}`;
-          percentageElement.textContent = `Percentage Increase: N/A`;
+          console.error('Error fetching token prices:', error);
+          pulsechainPriceElement.textContent = `Error fetching Pulsechain price: ${error.message}`;
+          pulsechainPercentageElement.textContent = `Percentage Increase: N/A`;
+          solanaPriceElement.textContent = `Error fetching Solana price: ${error.message}`;
+          solanaPercentageElement.textContent = `Percentage Increase: N/A`;
         } finally {
           // Set a delay (e.g., 10 seconds) before the next request
-          setTimeout(fetchTokenPrice, 10000);
+          setTimeout(fetchTokenPrices, 10000);
         }
       };
 
-      fetchTokenPrice();
+      fetchTokenPrices();
     });
   </script>
 </body>
