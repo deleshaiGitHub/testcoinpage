@@ -1,41 +1,29 @@
-/* Reset some default styles for better consistency */
-body, ul {
-    margin: 0;
-    padding: 0;
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f4f4f4;
 }
 
-/* Style the header and navigation */
-header {
-    background-color: #6441a5;
-    color: #fff;
-    padding: 10px 0;
+#app {
+  text-align: center;
 }
 
-nav ul {
-    list-style-type: none;
+#price-container {
+  margin-top: 20px;
 }
 
-nav ul li {
-    display: inline;
-    margin-right: 20px;
+#price {
+  font-size: 24px;
 }
 
-nav a {
-    color: #fff;
-    text-decoration: none;
-}
-
-/* Style the main content sections */
-main {
-    padding: 20px;
-}
-
-/* Add styles for featured streams, top creators, and trending categories sections as needed */
-
-/* Style the footer */
-footer {
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 10px 0;
+#progress-bar {
+  height: 20px;
+  width: 0;
+  background-color: #4caf50; /* Green color */
+  margin-top: 10px;
 }
